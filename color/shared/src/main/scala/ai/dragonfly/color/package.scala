@@ -403,26 +403,26 @@ object Color {
   val ref_V: Double = ( 9.0 * 100.0 ) / ( 95.047 + ( 15 * 100.0 ) + ( 3 * 108.883 ) )
 
   @JSExport implicit def toLuv (xyz: XYZ): LUV = {
-		val U: Double = ( 4.0 * xyz.X ) / ( xyz.X + ( 15.0 * xyz.Y ) + ( 3.0 * xyz.Z ) )
+    val U: Double = ( 4.0 * xyz.X ) / ( xyz.X + ( 15.0 * xyz.Y ) + ( 3.0 * xyz.Z ) )
     val V: Double = ( 9.0 * xyz.Y ) / ( xyz.X + ( 15.0 * xyz.Y ) + ( 3.0 * xyz.Z ) )
 
     var y0: Double = xyz.Y / 100
-		if ( y0 > 0.008856 ) y0 = Math.pow(y0, 1.0 / 3.0).toFloat
-		else y0 = ( 7.787 * y0 ) + ( 16.0 / 116.0 )
+    if ( y0 > 0.008856 ) y0 = Math.pow(y0, 1.0 / 3.0).toFloat
+    else y0 = ( 7.787 * y0 ) + ( 16.0 / 116.0 )
 
     val L: Float = (( 116.0 * y0 ) - 16.0).toFloat
     val u: Float = (13.0 * L * ( U - ref_U )).toFloat
     val v: Float = (13.0 * L * ( V - ref_V )).toFloat
 
-		FatFastLUV(L, u, v, xyz.rgba)
-	}
+    FatFastLUV(L, u, v, xyz.rgba)
+  }
 
   @JSExport implicit def toXYZ (luv: LUV): XYZ = {
 
     var y0: Double = ( luv.L + 16.0 ) / 116.0
     val powY0 = Math.pow(y0, 3.0)
-		if ( powY0 > 0.008856 ) y0 = powY0
-		else y0 = ( y0 - 16.0 / 116.0 ) / 7.787
+    if ( powY0 > 0.008856 ) y0 = powY0
+    else y0 = ( y0 - 16.0 / 116.0 ) / 7.787
 
     val var_U: Double = luv.u / ( 13.0 * luv.L ) + ref_U
     val var_V: Double = luv.v / ( 13.0 * luv.L ) + ref_V
@@ -432,9 +432,9 @@ object Color {
     val Z: Float = (( 9.0 * Y - ( 15.0 * var_V * Y ) - ( var_V * X ) ) / ( 3.0 * var_V )).toFloat
 
     FatFastXYZ(X, Y, Z, luv.rgba)
-	}
+  }
 
-  @JSExport implicit def toLuv(c: Color): LUV = toXyz(c)
+  @JSExport implicit def toLuv(c: Color): LUV = toLuv(toXyz(c))
 
   @JSExport implicit def toRgba(luv: LUV): RGBA = toXYZ(luv)
 
