@@ -187,7 +187,7 @@ trait LUV extends Color {
     }
   }
 
-  @JSExport override def toString() = "LAB(" + f"$L%1.3f" + "," + f"$u%1.3f" + "," + f"$v%1.3f" + ")"
+  @JSExport override def toString() = "LUV(" + f"$L%1.3f" + "," + f"$u%1.3f" + "," + f"$v%1.3f" + ")"
 
 }
 
@@ -348,6 +348,7 @@ object Color {
    */
 
   @JSExport implicit def toXyz(c: Color): XYZ = {
+    println("@JSExport implicit def toXyz(c: Color): XYZ = {")
     val R = Color.prepXyz(c.red)
     val G = Color.prepXyz(c.green)
     val B = Color.prepXyz(c.blue)
@@ -362,13 +363,14 @@ object Color {
 
   @JSExport implicit def toRgba (xyz: XYZ): RGBA = {
     RGBA(
-      strikeXyz(xyz.X * 3.24065 + xyz.Y * -1.5372 + xyz.Z * -0.4986).toInt,
-      strikeXyz(xyz.X * -0.9689 + xyz.Y * 1.87585 + xyz.Z * 0.04155).toInt,
-      strikeXyz(xyz.X * 0.05575 + xyz.Y * -0.2040 + xyz.Z * 1.0570).toInt
+      strikeXyz(xyz.X * 3.24065 + xyz.Y * -1.5372 + xyz.Z * -0.4986),
+      strikeXyz(xyz.X * -0.9689 + xyz.Y * 1.87585 + xyz.Z * 0.04155),
+      strikeXyz(xyz.X * 0.05575 + xyz.Y * -0.2040 + xyz.Z * 1.0570)
     )
   }
 
   @JSExport implicit def toXyz(lab: LAB): XYZ = {
+    println("@JSExport implicit def toXyz(lab: LAB): XYZ = {")
     val labY = (lab.L + 16.0) / 116.0
 
     SlowSmallXYZ(
@@ -417,8 +419,8 @@ object Color {
     FatFastLUV(L, u, v, xyz.rgba)
   }
 
-  @JSExport implicit def toXYZ (luv: LUV): XYZ = {
-
+  @JSExport implicit def toXyz (luv: LUV): XYZ = {
+    println("@JSExport implicit def toXyz (luv: LUV): XYZ = {")
     var y0: Double = ( luv.L + 16.0 ) / 116.0
     val powY0 = Math.pow(y0, 3.0)
     if ( powY0 > 0.008856 ) y0 = powY0
@@ -431,12 +433,12 @@ object Color {
     val X: Float = -(( 9.0 * Y * var_U ) / ( ( var_U - 4.0 ) * var_V  - var_U * var_V )).toFloat
     val Z: Float = (( 9.0 * Y - ( 15.0 * var_V * Y ) - ( var_V * X ) ) / ( 3.0 * var_V )).toFloat
 
-    FatFastXYZ(X, Y, Z, luv.rgba)
+    SlowSmallXYZ(X, Y, Z)
   }
 
   @JSExport implicit def toLuv(c: Color): LUV = toLuv(toXyz(c))
 
-  @JSExport implicit def toRgba(luv: LUV): RGBA = toXYZ(luv)
+  @JSExport implicit def toRgba(luv: LUV): RGBA = toXyz(luv)
 
   //@JSExport implicit def luvToInt(luv: LUV): Int = luv.rgba
 
@@ -531,12 +533,7 @@ object Color {
     CMYK(cyan, magenta, yellow, black)
   }
 
-  @JSExport("XYZ") def xyz(x: Float, y: Float, z: Float): XYZ = {
-    val xyz = XYZ(x, y, z)
-    val c = toRgba(xyz)
-    if (toXyz(c) != c) throw ColorComponentOutOfRangeException(f"Invalid component(s): XYZ($x, $y, $z)")
-    else xyz
-  }
+  @JSExport("XYZ") def xyz(x: Float, y: Float, z: Float): XYZ = XYZ(x, y, z)
 
   @JSExport("LAB") def lab(l: Float, a: Float, b: Float): LAB = SlowSmallLAB(l, a, b)
 
