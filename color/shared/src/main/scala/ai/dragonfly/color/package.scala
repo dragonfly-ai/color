@@ -348,7 +348,6 @@ object Color {
    */
 
   @JSExport implicit def toXyz(c: Color): XYZ = {
-    println("@JSExport implicit def toXyz(c: Color): XYZ = {")
     val R = Color.prepXyz(c.red)
     val G = Color.prepXyz(c.green)
     val B = Color.prepXyz(c.blue)
@@ -370,7 +369,6 @@ object Color {
   }
 
   @JSExport implicit def toXyz(lab: LAB): XYZ = {
-    println("@JSExport implicit def toXyz(lab: LAB): XYZ = {")
     val labY = (lab.L + 16.0) / 116.0
 
     SlowSmallXYZ(
@@ -420,7 +418,6 @@ object Color {
   }
 
   @JSExport implicit def toXyz (luv: LUV): XYZ = {
-    println("@JSExport implicit def toXyz (luv: LUV): XYZ = {")
     var y0: Double = ( luv.L + 16.0 ) / 116.0
     val powY0 = Math.pow(y0, 3.0)
     if ( powY0 > 0.008856 ) y0 = powY0
