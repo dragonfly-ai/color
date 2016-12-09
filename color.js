@@ -1,1 +1,0 @@
-color/js/target/scala-2.12/color-opt.js
