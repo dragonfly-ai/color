@@ -47,13 +47,13 @@ var hsl0 = Color().HSL(180, 20, 75);
 var cmyk0 = Color().CMYK(0.2, 0.8, 0.5, 0.1);
 var xyz0 = Color().XYZ(28.586,42.301,55.374);
 var lab0 = Color().LAB(86.947,-44.123,2.272);
-var luv0 = Color().LUV(86.947,-44.123,2.272);
+var luv0 = Color().LUV(33.027,-21.251,31.520);
 </pre>
 Convert colors between spaces: <br />
 <pre>
-Color().toLab(hsv0).toString() // returns 'LAB(74.696,-12.612,-4.198)'
-Color().toLuv(lab0).toString() // returns 'LUV(86.947,-56.998,10.683)'
-Color().toInt(hsv0) // returns-6701121
+Color().toLab(hsv0).toString()  // returns 'LAB(74.696,-12.612,-4.198)'
+Color().toLuv(lab0).toString()  // returns 'LUV(86.947,-56.998,10.683)'
+Color().toInt(hsv0)             // returns -6701121
 Color().toRgba(xyz0).toString()  // returns 'RGBA(0,194,190,255)'
 Color().toCmyk(hsl0).toString()  // returns 'CMYK(0.123,0.000,0.000,0.200)'
 Color().toXyz(cmyk0).toString()  // returns 'XYZ(23.839,13.382,17.546)'
