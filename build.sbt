@@ -2,7 +2,7 @@ scalaVersion in ThisBuild := "2.12.0"
 
 name in ThisBuild := "color"
 
-organization in ThisBuild := "ai.dragonfly"
+organization in ThisBuild := "ai.dragonfly.code"
 
 version in ThisBuild := "0.1"
 
