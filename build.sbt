@@ -1,5 +1,7 @@
 scalaVersion in ThisBuild := "2.12.0"
 
+publishTo in ThisBuild := Some(Resolver.file("file",  new File( "/var/www/maven" )) )
+
 val color = crossProject.settings(
   libraryDependencies += "org.scala-js" %% "scalajs-stubs" % scalaJSVersion % "provided"
 ).jsSettings(
