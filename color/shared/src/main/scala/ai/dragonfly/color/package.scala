@@ -2,51 +2,144 @@ package ai.dragonfly.color
 
 import scalajs.js
 
-import scala.scalajs.js.annotation.{JSExport, JSExportAll}
+import js.annotation.{JSExport, JSExportAll}
 
 
 /**
  * Created by clifton on 4/24/15.
  */
 
-/***
- * TODO:
- * 1.  add sRGB color space
- * 2.  add alpha byte to color types that don't already have it?
- * 3.  export to javascript
- * 4.  test
- ***/
+/**
+ * Color is the base trait from which all other color types inherit.
+ */
 
 trait Color {
+  /**
+   * @return a 32 bit integer that represents this color in RGBA space.
+   * The most significant byte encodes the alpha value, the second most significant byte encodes red,
+   * the third most significant byte encodes green, and the least significant byte encodes blue.
+   */
   @JSExport def rgba: Int
+
+  /**
+   * @return the red component of this color in RGB space.
+   */
   @JSExport def red = rgba >> 16 & 0xff
+  /**
+   * @return the green component of this color in RGB space.
+   */
   @JSExport def green = rgba >> 8 & 0xff
+  /**
+   * @return the blue component of this color in RGB space.
+   */
   @JSExport def blue = rgba & 0xff
+  /**
+   * @return the alpha component of this color in RGBA space.
+   */
   @JSExport def alpha = rgba >> 24 & 0xff
 
+  /**
+   * @return the hashcode.  For all color types, the hashcode function returns the same result as rgba
+   */
   override def hashCode(): Int = rgba
 
+  /**
+   * @return true if these colors are equal in RGBA space, false otherwise
+   */
   override def equals(o: Any): Boolean = o match {
     case c: Color => this.rgba == c.rgba
     case _ => false
   }
 
+  /**
+   * @return a hexadecimal string representing the rgba integer for this color.
+   * @example {{{
+   * val c = RGBA(72,105,183)
+   * c.hex() // returns "ff4869b7"
+   * }}}
+   */
   @JSExport def hex(): String = Integer.toHexString(rgba)
 
+  /**
+   * @return a string representing the color in an html friendly way.
+   * @example {{{
+   * val c = RGBA(72,105,183)
+   * c.html() // returns "#4869b7"
+   * }}}
+   */
   @JSExport def html(): String = "#" + Integer.toHexString(rgba | 0xff000000).substring(2)
 
+  /**
+   * @return a string representing the color in an SVG friendly way.
+   * @example {{{
+   * val c = RGBA(72,105,183)
+   * c.svg() // returns "rgb(72,105,183)"
+   * }}}
+   *
+   * if the color has an alpha value less than 255, in other words, if the color has any measure of translucency,
+   * this method returns an rgba svg string instead of an rgb string.
+   * @example {{{
+   * val c = RGBA(72,105,183, 128)
+   * c.svg() // returns "rgba(72,105,183,0.501960813999176)"
+   * }}}
+   */
   @JSExport def svg(): String = {
     if (alpha < 255) "rgba(" + red + "," + green + "," + blue + "," + (alpha / 255f) + ")"
     else "rgb(" + red + "," + green + "," + blue + ")"
   }
 }
 
+/**
+ * Companion object for the RGBA case class.
+ */
+
 object RGBA {
+  /**
+   * apply method to create an RGBA instance from separate, specified red, green, blue, and optional alpha components.
+   * parameter values are derived from the least significant byte.  Integer values that range outside of [0-255] may
+   * give unexpected results.  For values taken from user input, sensors, or otherwise uncertain sources, consider using
+   * the factory method in the Color companion object.
+   * @see [[ai.dragonfly.color.Color.rgba]] for a method of constructing RGBA objects that validates inputs.
+   * @param red integer value from [0-255] representing the red component in RGB space.
+   * @param green integer value from [0-255] representing the green component in RGB space.
+   * @param blue integer value from [0-255] representing the blue component in RGB space.
+   * @param alpha optional integer value from [0-255] representing the alpha component in RGBA space.  Defaults to 255.
+   * @return an instance of the RGBA case class.
+   * @example {{{ val c = RGBA(72,105,183) }}}
+   */
   def apply(red: Int, green: Int, blue: Int, alpha: Int = 255): RGBA = RGBA(red<<16|green<<8|blue|(alpha<<24))
 }
 
+/**
+ * RGBA is the primary case class for representing colors in RGBA space.
+ *
+ * @constructor Create a new RGBA object from an Int.
+ *
+ *  @see [[https://en.wikipedia.org/wiki/RGB_color_space]] for more information on the RGB color space.
+ *
+ *  @param rgba a 32 bit integer that represents this color in RGBA space.
+ * The most significant byte encodes the alpha value, the second most significant byte encodes red,
+ * the third most significant byte encodes green, and the least significant byte encodes blue.
+ * @return an instance of the RGBA case class.
+ * @example {{{
+ * val c = RGBA(-1)  // returns fully opaque white
+ * c.toString()  // returns "RGBA(255,255,255,255)"
+ * RGBA(0xFF0000FF).toString() // returns "RGBA(255,0,0,255)"
+ * }}}
+ */
 @SerialVersionUID(1L)
 case class RGBA(override val rgba: Int) extends Color {
+  /**
+   * @return the distance between this color and the parameter in rgb space.
+   * Distances exclude alpha information.
+   * Distances range from [0, 441.6729559300637]
+   * @example {{{
+   * val c1 = RGBA(72,105,183)
+   * val c2 = RGBA(0,105,255)
+   * c1.distanceTo(c1) // returns 0
+   * c1.distanceTo(c2) // returns 101.82337649086284
+   * }}}
+   */
   @JSExport def distanceTo (c: Color): Double = {
     var dR = red - c.red; dR = dR * dR
     var dG = green - c.green; dG = dG * dG
@@ -56,54 +149,188 @@ case class RGBA(override val rgba: Int) extends Color {
   override def toString() = "RGBA(" + red + "," + green + "," + blue + "," + alpha + ")"
 }
 
+/**
+ * HSV is the primary case class for representing colors in HSV space.
+ *
+ * @constructor Create a new HSV object from three float values.  This constructor does not validate
+ * input parameters.  For values taken from user input, sensors, or otherwise uncertain sources, consider using
+ * the factory method in the Color companion object.
+ *
+ * @see [[ai.dragonfly.color.Color.hsv]] for a method of constructing HSV objects that validates inputs.
+ * @see [[https://en.wikipedia.org/wiki/HSL_and_HSV]] for more information about the HSV color space.
+ * @param hue an angle ranging from [0-360] degrees.  Values outside of this range may cause errors.
+ * @param saturation a percentage ranging from [0-100].  Values outside of this range may cause errors.
+ * @param value a percentage ranging from [0-100].  Values outside of this range may cause errors.
+ * @return an instance of the HSV case class.
+ * @example {{{
+ * val c = HSV(211f, 75f, 33.3333f)
+ * c.toString()  // returns "HSV(211.000,75.000,33.333)"
+ * }}}
+ */
 @JSExportAll @SerialVersionUID(1L)
 case class HSV(hue: Float, saturation: Float, value: Float) extends Color {
   override def rgba: Int = Color.toRgba(this)
   @JSExport override def toString() = "HSV(" + f"$hue%1.3f" + "," + f"$saturation%1.3f" + "," + f"$value%1.3f" + ")"
 }
 
+/**
+ * HSL is the primary case class for representing colors in HSL space.
+ *
+ * @constructor Create a new HSV object from three float values.  This constructor does not validate input parameters.
+ * For values taken from user input, sensors, or otherwise uncertain sources, consider using the factory method in the Color companion object.
+ *
+ * @see [[ai.dragonfly.color.Color.hsl]] for a method of constructing HSL objects that validates inputs.
+ * @see [[https://en.wikipedia.org/wiki/HSL_and_HSV]] for more information about the HSL color space.
+ * @param hue an angle ranging from [0-360] degrees.  Values outside of this range may cause errors.
+ * @param saturation a percentage ranging from [0-100].  Values outside of this range may cause errors.
+ * @param lightness a percentage ranging from [0-100].  Values outside of this range may cause errors.
+ * @return an instance of the HSL case class.
+ * @example {{{
+ * val c = HSL(211f, 75f, 33.3333f)
+ * c.toString()  // returns "HSL(211.000,75.000,33.333)"
+ * }}}
+ */
 @JSExportAll @SerialVersionUID(1L)
 case class HSL(hue: Float, saturation: Float, lightness: Float) extends Color {
   override def rgba: Int = Color.toRgba(this)
   override def toString() = "HSL(" + f"$hue%1.3f" + "," + f"$saturation%1.3f" + "," + f"$lightness%1.3f" + ")"
+
+  /**
+   * @return a string representing the color in an SVG friendly way.
+   * @example {{{
+   * val c = HSL(211f, 75f, 33.3333f)
+   * c.svg() // returns "hsl(211.000,75.0%,33.3%)"
+   * }}}
+   */
   override def svg(): String = "hsl(" +f"$hue%1.3f" + "," + f"$saturation%1.1f" + "%," + f"$lightness%1.1f" + "%)"
 }
 
+/**
+ * CMYK is the primary case class for representing colors in CMYK space.
+ *
+ * @constructor Create a new HSV object from three float values.  This constructor does not validate input parameters.
+ * For values taken from user input, sensors, or otherwise uncertain sources, consider using the factory method in the Color companion object.
+ *
+ * @see [[ai.dragonfly.color.Color.cmyk]] for a method of constructing CMYK objects that validates inputs.
+ * @see [[https://en.wikipedia.org/wiki/CMYK_color_model]] for more information about the CMYK color space.
+ * @param cyan a value ranging from [0-1].  Values outside of this range may cause errors.
+ * @param magenta a value ranging from [0-1].  Values outside of this range may cause errors.
+ * @param yellow a value ranging from [0-1].  Values outside of this range may cause errors.
+ * @param black a value ranging from [0-1].  Values outside of this range may cause errors.
+ * @return an instance of the HSV case class.
+ * @example {{{
+ * val c = CMYK(1f, 0.25f, 0.5f, 0f)
+ * c.toString()  // returns "CMYK(1.000,0.250,0.500,0.000)"
+ * }}}
+ */
 @JSExportAll @SerialVersionUID(1L)
 case class CMYK(cyan: Float, magenta: Float, yellow: Float, black: Float) extends Color {
   override def rgba: Int = Color.toRgba(this)
   override def toString() = "CMYK(" + f"$cyan%1.3f" + "," + f"$magenta%1.3f" + "," + f"$yellow%1.3f" + "," + f"$black%1.3f" + ")"
 }
 
+/**
+ * XYZ is the base trait for classes that encode colors in the CIE XYZ color space.
+ * LAB and LUV classes depend on XYZ for conversions to and from RGB, HSL, HSV, and CMYK
+ *
+ * @see [[https://en.wikipedia.org/wiki/CIE_1931_color_space]] for more information on CIE XYZ.
+ */
 trait XYZ extends Color {
+  /** @return the X component of this color in XYZ space. */
   @JSExport def X: Float
+
+  /** @return the Y component of this color in XYZ space. */
   @JSExport def Y: Float
+
+  /** @return the Z component of this color in XYZ space. */
   @JSExport def Z: Float
 
   @JSExport override def toString() = "XYZ(" + f"$X%1.3f" + "," + f"$Y%1.3f" + "," + f"$Z%1.3f" + ")"
 }
 
+/**
+ * Companion object for SlowSlimXYZ and FastFatXYZ classes.
+ */
 object XYZ {
-  def apply(rgba: RGBA): XYZ = rgba
-  def apply(X: Float, Y: Float, Z: Float): XYZ = SlowSmallXYZ(X, Y, Z)
+  /**
+   * apply method to create instances of the SlowSlimXYZ case class.  This method does not validate its input parameters.
+   *
+   * @param X the X component of the XYZ color.
+   * @param Y the Y component of the XYZ color.
+   * @param Z the Z component of the XYZ color.
+   * @return an instance of the XYZ case class.
+   * @example {{{ val c = XYZ(22.527,38.820,26.728) }}}
+   */
+  def apply(X: Float, Y: Float, Z: Float): XYZ = SlowSlimXYZ(X, Y, Z)
 }
 
+/**
+ * The SlowSlimXYZ class stores only the X, Y, and Z components of the XYZ color it encodes while FastFatXYZ also stores
+ * an Int representing its RGBA value.
+ *
+ * SlowSlimXYZ requires 4 bytes less memory than FastFatXYZ, however conversions from SlowSlimXYZ to non CIE color spaces:
+ * RGB, HSV, HSL, CMYK, require more computational resources than FastFatXYZ.
+ *
+ * Use SlowSlimXYZ to save memory on XYZ colors that will rarely or never require conversion to other color spaces.
+ * Use FastFatXYZ in situations where color space conversion speed matters more than memory.
+ *
+ * @constructor Create a new SlowSlimXYZ object from three float values.  This constructor does not validate input parameters.
+ *
+ * @param X the X component of the XYZ color.
+ * @param Y the Y component of the XYZ color.
+ * @param Z the Z component of the XYZ color.
+ * @return an instance of the SlowSlimXYZ case class.
+ * @example {{{ val c = SlowSlimXYZ(22.527,38.820,26.728) }}}
+ */
 @SerialVersionUID(1L)
-case class SlowSmallXYZ(override val X: Float, override val Y: Float, override val Z: Float) extends XYZ {
-  lazy val rgbA: Int = Color.toRgba(this)
-  override def rgba = { rgbA }
+case class SlowSlimXYZ(override val X: Float, override val Y: Float, override val Z: Float) extends XYZ {
+  override def rgba: Int = this
 }
 
+/**
+ * FastFatXYZ requires 4 bytes more memory than SlowSlimXYZ, however conversions from FastFatXYZ to non CIE color spaces:
+ * RGB, HSV, HSL, CMYK, compute much faster than from SlowSlimXYZ.
+ *
+ * Use FastFatXYZ in situations where color space conversion speed matters more than memory.
+ * Use SlowSlimXYZ to save memory on XYZ colors that will rarely or never require conversion to other color spaces.
+ *
+ * @constructor Create a new FastFatXYZ object from three float values and an Int.  This constructor does not validate input parameters.
+ * @param X the X component of the XYZ color.
+ * @param Y the Y component of the XYZ color.
+ * @param Z the Z component of the XYZ color.
+ * @param rgba a 32 bit integer that represents this color in RGBA space.
+ * @return an instance of the FastFatXYZ case class.
+ * @example {{{ val c = FastFatXYZ(22.527, 38.820, 26.728, 0xff00bf80) }}}
+ */
 @SerialVersionUID(1L)
-case class FatFastXYZ(override val X: Float, override val Y: Float, override val Z: Float, override val rgba: Int) extends XYZ
+case class FastFatXYZ(override val X: Float, override val Y: Float, override val Z: Float, override val rgba: Int) extends XYZ
 
+
+/**
+ * LAB is the base trait for classes that encode colors in the CIE L*a*b* color space.
+ *
+ * @see [[https://en.wikipedia.org/wiki/Lab_color_space]] for more information on CIE L*a*b*.
+ */
 trait LAB extends Color {
+  /** @return the L* component of this color in CIE L*a*b* color space. */
   @JSExport def L: Float
+
+  /** @return the a* component of this color in CIE L*a*b* color space. */
   @JSExport def a: Float
+
+  /** @return the a* component of this color in CIE L*a*b* color space. */
   @JSExport def b: Float
 
-  @JSExport def distanceTo (that: LAB): Double = LAB.labDistance(this, that)
+  /**
+   * @param lab a color
+   * @return the euclidean distance, in CIE L*a*b* color space, between this and the color passed as an argument.
+   */
+  @JSExport def distanceTo (lab: LAB): Double = LAB.labDistance(this, lab)
 
+  /**
+   * @param lab a color
+   * @return the distance, in CIE L*a*b* color space, between the brightness of this color and the brightness of the color passed as an argument.
+   */
   @JSExport def valueDistanceTo(lab: LAB): Double = {
     val dL = L - lab.L
     Math.sqrt(dL * dL)
@@ -116,12 +343,25 @@ trait LAB extends Color {
       b: (-107.86368, 94.48248)
   */
   // Found 857621 colors 16785409
-  @JSExport def discretize(): LAB = SlowSmallLAB(Math.round(L), Math.round(a), Math.round(b))
+  /**
+   * @return a version of this color with all color components rounded to the nearest integer.
+   */
+  @JSExport def discretize(): LAB = SlowSlimLab(Math.round(L), Math.round(a), Math.round(b))
 
+  /**
+   * @param r a color
+   * @return a version of this color with all color components rounded to the nearest coordinate in a uniform, three dimensional, grid
+   * with grid cell dimensions = r X r X r.
+   */
   @JSExport def discretize(r: Float): LAB = {
-    SlowSmallLAB(Math.round(L/r)*r, Math.round(a/r)*r, Math.round(b/r)*r)
+    SlowSlimLab(Math.round(L/r)*r, Math.round(a/r)*r, Math.round(b/r)*r)
   }
 
+  /**
+   * This equals method considers two colors equal if they are imperceptibly different from each other.
+   * @param o an object to compare to this color.
+   * @return true if the parameter is a color and it's squared euclidean distance from this color is less than 0.01 in CIE L*a*b* color space, false otherwise.
+   */
   @JSExport override def equals(o: Any): Boolean = {
     o match {
       case lab: LAB => LAB.labDistanceSquared(this, lab) < 0.01
@@ -132,6 +372,9 @@ trait LAB extends Color {
   @JSExport override def toString() = "LAB(" + f"$L%1.3f" + "," + f"$a%1.3f" + "," + f"$b%1.3f" + ")"
 }
 
+/**
+ * Companion object for SlowSlimLAB and FastFatLAB classes.
+ */
 object LAB {
   val L_MAX = 100.0f
   val L_MIN = -5.5999998E-8f
@@ -147,6 +390,11 @@ object LAB {
   val STANDARD_DEVIATION_NORMAL = 41f
   val STANDARD_DEVIATION_POISSON = 9.14f
 
+  /**
+   * @param lab1 a color
+   * @param lab2 a color
+   * @return the square of the euclidean distance, in CEI L*a*b* space, between the two colors passed as arguments.
+   */
   def labDistanceSquared (lab1: LAB, lab2: LAB): Double = {
     var dL = lab1.L - lab2.L; dL = dL * dL
     var dA = lab1.a - lab2.a; dA = dA * dA
@@ -154,32 +402,92 @@ object LAB {
     dL + dA + dB
   }
 
+  /**
+   * @param lab1 a color
+   * @param lab2 a color
+   * @return the euclidean distance, in CEI L*a*b* space, between the two colors passed as arguments.
+   */
   def labDistance (lab1: LAB, lab2: LAB): Double = {
     Math.sqrt(labDistanceSquared(lab1, lab2))
   }
 }
 
+/**
+ * The SlowSlimLab class stores only the L, a, and b components of the CIE L*a*b* color it encodes while FastFatLab also stores
+ * an Int representing its RGBA value.
+ *
+ * SlowSlimLab requires 4 bytes less memory than FatFastLab, however conversions from SlowSlimLab to non CIE color spaces:
+ * RGB, HSV, HSL, CMYK, require more computational resources than FastFatLab.
+ *
+ * Use SlowSlimLab to save memory on CIE L*a*b* colors that will rarely or never require conversion to other color spaces.
+ * Use FastFatLab in situations where color space conversion speed matters more than memory.
+ *
+ * @constructor Create a new SlowSlimLab object from three float values.  This constructor does not validate input parameters.
+ *
+ * @param L the L* component of the CIE L*a*b* color.
+ * @param a the a* component of the CIE L*a*b* color.
+ * @param b the b* component of the CIE L*a*b* color.
+ * @return an instance of the SlowSlimLab case class.
+ * @example {{{ val c = SlowSlimLab(72.872, -0.531, 71.770) }}}
+ */
 @SerialVersionUID(1L)
-case class SlowSmallLAB(override val L: Float, override val a: Float, override val b: Float) extends LAB {
+case class SlowSlimLab(override val L: Float, override val a: Float, override val b: Float) extends LAB {
   lazy val rgbA: Int = Color.toRgba(this)
   override def rgba = { rgbA }
 }
 
+/**
+ * FastFatLab requires 4 bytes more memory than SlowSlimLab, however conversions from FastFatLab to non CIE color spaces:
+ * RGB, HSV, HSL, CMYK, compute much faster than from SlowSlimLab.
+ *
+ * Use FastFatLab in situations where color space conversion speed matters more than memory.
+ * Use SlowSlimLab to save memory on CIE L*a*b* colors that will rarely or never require conversion to other color spaces.
+ *
+ * @constructor Create a new FastFatLab object from three float values and an Int.  This constructor does not validate input parameters.
+ * @param L the L* component of the CIE L*a*b* color.
+ * @param a the a* component of the CIE L*a*b* color.
+ * @param b the b* component of the CIE L*a*b* color.
+ * @param rgba a 32 bit integer that represents this color in RGBA space.
+ * @return an instance of the FastFatLab case class.
+ * @example {{{ val c = FastFatLab(70.263, -66.371, 65.333, 0xff31c61c) }}}
+ */
 @SerialVersionUID(1L)
-case class FatFastLAB(override val L: Float, override val a: Float, override val b: Float, override val rgba: Int) extends LAB
+case class FastFatLab(override val L: Float, override val a: Float, override val b: Float, override val rgba: Int) extends LAB
 
+
+/**
+ * LUV is the base trait for classes that encode colors in the CIE L*u*v* color space.
+ *
+ * @see [[https://en.wikipedia.org/wiki/CIELUV]] for more information on CIE L*u*v*.
+ */
 trait LUV extends Color {
+  /** @return the L* component of this color in CIE L*u*v* color space. */
   @JSExport def L: Float
+  /** @return the u* component of this color in CIE L*u*v* color space. */
   @JSExport def u: Float
+  /** @return the u* component of this color in CIE L*u*v* color space. */
   @JSExport def v: Float
 
-  @JSExport def distanceTo (that: LUV): Double = LUV.luvDistance(this, that)
+  /**
+   * @param luv a color
+   * @return the euclidean distance, in CIE L*u*v* color space, between this and the color passed as an argument.
+   */
+  @JSExport def distanceTo (luv: LUV): Double = LUV.luvDistance(this, luv)
 
-  @JSExport def valueDistanceTo(lab: LUV): Double = {
-    val dL = L - lab.L
+  /**
+   * @param luv a color
+   * @return the distance, in CIE L*u*v* color space, between the brightness of this color and the brightness of the color passed as an argument.
+   */
+  @JSExport def valueDistanceTo(luv: LUV): Double = {
+    val dL = L - luv.L
     Math.sqrt(dL * dL)
   }
 
+  /**
+   * This equals method considers two colors equal if they are imperceptibly different from each other.
+   * @param o an object to compare to this color.
+   * @return true if the parameter is a color and it's squared euclidean distance from this color is less than 0.01 in CIE L*u*v* color space, false otherwise.
+   */
   @JSExport override def equals(o: Any): Boolean = {
     o match {
       case luv: LUV => LUV.luvDistanceSquared(this, luv) < 0.01
@@ -191,7 +499,15 @@ trait LUV extends Color {
 
 }
 
+/**
+ * Companion object for SlowSlimLUV and FastFatLUV classes.
+ */
 object LUV {
+  /**
+   * @param luv1 a color
+   * @param luv2 a color
+   * @return the square of the euclidean distance, in CEI L*u*v* space, between the two colors passed as arguments.
+   */
   def luvDistanceSquared (luv1: LUV, luv2: LUV): Double = {
     var dL = luv1.L - luv2.L; dL = dL * dL
     var dU = luv1.u - luv2.u; dU = dU * dU
@@ -199,19 +515,60 @@ object LUV {
     dL + dU + dV
   }
 
+  /**
+   * @param luv1 a color
+   * @param luv2 a color
+   * @return the euclidean distance, in CEI L*u*v* space, between the two colors passed as arguments.
+   */
   def luvDistance (luv1: LUV, luv2: LUV): Double = Math.sqrt(luvDistanceSquared(luv1, luv2))
 }
 
+/**
+ * The SlowSlimLuv class stores only the L, a, and b components of the CIE L*u*v* color it encodes while FastFatLuv also stores
+ * an Int representing its RGBA value.
+ *
+ * SlowSlimLuv requires 4 bytes less memory than FastFatLuv, however conversions from SlowSlimLuv to non CIE color spaces:
+ * RGB, HSV, HSL, CMYK, require more computational resources than FastFatLuv.
+ *
+ * Use SlowSlimLuv to save memory on CIE L*u*v* colors that will rarely or never require conversion to other color spaces.
+ * Use FastFatLuv in situations where color space conversion speed matters more than memory.
+ *
+ * @constructor Create a new SlowSlimLuv object from three float values.  This constructor does not validate input parameters.
+ *
+ * @param L the L* component of the CIE L*u*v* color.
+ * @param u the u* component of the CIE L*u*v* color.
+ * @param v the v* component of the CIE L*u*v* color.
+ * @return an instance of the SlowSlimLuv case class.
+ * @example {{{ val c = SlowSlimLuv(14.756, -3.756, -58.528) }}}
+ */
 @SerialVersionUID(1L)
-case class SlowSmallLUV(override val L: Float, override val u: Float, override val v: Float) extends LUV {
+case class SlowSlimLuv(override val L: Float, override val u: Float, override val v: Float) extends LUV {
   lazy val rgbA: Int = Color.toRgba(this)
   override def rgba = { rgbA }
 }
 
+/**
+ * FastFatLuv requires 4 bytes more memory than SlowSlimLuv, however conversions from FastFatLuv to non CIE color spaces:
+ * RGB, HSV, HSL, CMYK, compute much faster than from SlowSlimLuv.
+ *
+ * Use FastFatLuv in situations where color space conversion speed matters more than memory.
+ * Use SlowSlimLuv to save memory on CIE L*u*v* colors that will rarely or never require conversion to other color spaces.
+ *
+ * @constructor Create a new FastFatLuv object from three float values and an Int.  This constructor does not validate input parameters.
+ * @param L the L* component of the CIE L*u*v* color.
+ * @param u the u* component of the CIE L*u*v* color.
+ * @param v the v* component of the CIE L*u*v* color.
+ * @param rgba a 32 bit integer that represents this color in RGBA space.
+ * @return an instance of the FastFatLuv case class.
+ * @example {{{ val c = FastFatLuv(14.756, -3.756, -58.528, 0xff0a0188) }}}
+ */
 @SerialVersionUID(1L)
-case class FatFastLUV(override val L: Float, override val u: Float, override val v: Float, override val rgba: Int) extends LUV
+case class FastFatLuv(override val L: Float, override val u: Float, override val v: Float, override val rgba: Int) extends LUV
 
 
+/**
+ * Color contains convenience methods, fields, and implicit conversion methods.
+ */
 @JSExport("Color")
 object Color {
 
@@ -222,6 +579,11 @@ object Color {
   @JSExport val DARK_GRAY = gray(64)
   @JSExport val LIGHT_GRAY = gray(192)
 
+  /**
+   * Use Color.random() to obtain a random color in the form of an RGBA instance.
+   * This method samples the Red, Green, and Blue color components uniformly, but always returns 255 for the alpha component.
+   * @return a randomly generated color sampled from the RGB Color Space.
+   */
   @JSExport def random(): RGBA = {
     RGBA(
       (Math.random() * 255).toInt,
@@ -230,7 +592,17 @@ object Color {
     )
   }
 
-  @JSExport def gray(value: Int): RGBA = RGBA(value, value, value)
+  /**
+   * generate an RGBA instance from a single value.  This method validates the intensity parameter.
+   *
+   * @param intensity the intensity of the desired gray value ranging from [0-255].
+   * @return an RGBA instance encoding the desired grayscale intensity.
+   * @throws ColorComponentOutOfRangeException if intensity escapes the range [0-255].
+   */
+  @JSExport def gray(intensity: Int): RGBA = {
+    if (validRgbaIntensity(intensity)) RGBA(intensity, intensity, intensity)
+    else throw ColorComponentOutOfRangeException(f"Intensity $intensity outside range [0-255]")
+  }
 
   implicit def fromAwtColor(awtColor: java.awt.Color): RGBA = RGBA(awtColor.getRGB)
 
@@ -246,9 +618,9 @@ object Color {
    * http://www.rapidtables.com/convert/color/rgb-to-hsv.htm
  */
 
-  case class HueMaxMin(hue: Float, cMax: Float, cMin: Float)
+  private case class HueMaxMin(hue: Float, cMax: Float, cMin: Float)
 
-  case class HueCXM(hue: Float, c: Float, x: Float, m: Float)
+  private case class HueCXM(hue: Float, c: Float, x: Float, m: Float)
 
   private def colorToHueMaxMin(c: Color): HueMaxMin = {
     //  1/255 = 0.00392156862745098
@@ -348,11 +720,11 @@ object Color {
    */
 
   @JSExport implicit def toXyz(c: Color): XYZ = {
-    val R = Color.prepXyz(c.red)
-    val G = Color.prepXyz(c.green)
-    val B = Color.prepXyz(c.blue)
+    val R = prepXyz(c.red)
+    val G = prepXyz(c.green)
+    val B = prepXyz(c.blue)
 
-    FatFastXYZ (
+    FastFatXYZ (
       (R * 0.4124 + G * 0.3576 + B * 0.1805).toFloat,
       (R * 0.2126 + G * 0.7152 + B * 0.0722).toFloat,
       (R * 0.0193 + G * 0.1192 + B * 0.9505).toFloat,
@@ -371,7 +743,7 @@ object Color {
   @JSExport implicit def toXyz(lab: LAB): XYZ = {
     val labY = (lab.L + 16.0) / 116.0
 
-    SlowSmallXYZ(
+    SlowSlimXYZ(
       (strikeLab(lab.a / 500.0 + labY) * 95.047).toFloat,
       (strikeLab(labY) * 100.0).toFloat,
       (strikeLab(labY - lab.b / 200.0) * 108.883).toFloat
@@ -389,7 +761,7 @@ object Color {
     val labY = prepLab(R * 0.0021260000000000003 + G * 0.0071519999999999995 + B * 0.000722)
     val labZ = prepLab(R * 0.00017725448417108274 + G * 0.0010947530835851327 + B * 0.008729553741171717)
 
-    FatFastLAB(
+    FastFatLab(
       ((116.0 * labY) - 16.0).toFloat,
       (500.0 * (labX - labY)).toFloat,
       (200.0 * (labY - labZ)).toFloat,
@@ -399,8 +771,8 @@ object Color {
 
   // Observer = 2 degrees, Illuminant = D65
   // ref_U and ref_V are constants used to convert between LUV and XYZ.
-  val ref_U: Double = ( 4.0 * 95.047 ) / ( 95.047 + ( 15 * 100.0 ) + ( 3 * 108.883 ) )
-  val ref_V: Double = ( 9.0 * 100.0 ) / ( 95.047 + ( 15 * 100.0 ) + ( 3 * 108.883 ) )
+  private val ref_U: Double = ( 4.0 * 95.047 ) / ( 95.047 + ( 15 * 100.0 ) + ( 3 * 108.883 ) )
+  private val ref_V: Double = ( 9.0 * 100.0 ) / ( 95.047 + ( 15 * 100.0 ) + ( 3 * 108.883 ) )
 
   @JSExport implicit def toLuv (xyz: XYZ): LUV = {
     val U: Double = ( 4.0 * xyz.X ) / ( xyz.X + ( 15.0 * xyz.Y ) + ( 3.0 * xyz.Z ) )
@@ -414,7 +786,7 @@ object Color {
     val u: Float = (13.0 * L * ( U - ref_U )).toFloat
     val v: Float = (13.0 * L * ( V - ref_V )).toFloat
 
-    FatFastLUV(L, u, v, xyz.rgba)
+    FastFatLuv(L, u, v, xyz.rgba)
   }
 
   @JSExport implicit def toXyz (luv: LUV): XYZ = {
@@ -430,7 +802,7 @@ object Color {
     val X: Float = -(( 9.0 * Y * var_U ) / ( ( var_U - 4.0 ) * var_V  - var_U * var_V )).toFloat
     val Z: Float = (( 9.0 * Y - ( 15.0 * var_V * Y ) - ( var_V * X ) ) / ( 3.0 * var_V )).toFloat
 
-    SlowSmallXYZ(X, Y, Z)
+    SlowSlimXYZ(X, Y, Z)
   }
 
   @JSExport implicit def toLuv(c: Color): LUV = toLuv(toXyz(c))
@@ -463,7 +835,12 @@ object Color {
   }
 
   // Utility methods:
-
+  /**
+   * Overlays colors based on their alpha transparencies.
+   * @param c1 the bottom color.
+   * @param c2 the top color, overlaid on top of c1.
+   * @return the color resulting from the overlay of c2 on top of c1.
+   */
   @JSExport def alphaBlend(c1: RGBA, c2: RGBA): RGBA = {
     if (c1.alpha >= 255) c1.rgba
     else {
@@ -478,35 +855,63 @@ object Color {
     }
   }
 
+  /**
+   * Computes a weighted average of two colors in RGBA color space.
+   * @param c1 the first color.
+   * @param w1 the weight of the first color in the range of [0-1].
+   * @param c2 the second color.
+   * @param w2 the weight of the second color in the range of [0-1].
+   * @return the weighted average: c1 * w1 + c2 * w2.
+   */
   @JSExport def weightedAverage(c1: RGBA, w1: Float, c2: RGBA, w2: Float): RGBA = {
-    if (c1.alpha == 0 && c2.alpha != 0) c2
-    else if (c1.alpha != 0 && c2.alpha == 0) c1
-    else {
-      RGBA(
-        (w1 * c1.red + w2 * c2.red).toInt,
-        (w1 * c1.green + w2 * c2.green).toInt,
-        (w1 * c1.blue + w2 * c2.blue).toInt,
-        Math.max(0, Math.min(255, (w1 * c1.alpha +  w2 * c2.alpha).toInt))
-      )
-    }
+    RGBA(
+      (w1 * c1.red + w2 * c2.red).toInt,
+      (w1 * c1.green + w2 * c2.green).toInt,
+      (w1 * c1.blue + w2 * c2.blue).toInt,
+      Math.max(0, Math.min(255, (w1 * c1.alpha +  w2 * c2.alpha).toInt))
+    )
   }
 
   // rgb component validation
-  private def validRgbComponent(component: Int): Boolean = component >= 0 && component < 256
+  /**
+   * convenience method to validate potential red, green, blue, and alpha intensities.
+   * @param intensity the intensity with the potential to encode a red, green, blue, or alpha component in RGBA color space.  Valid values range from [0-255].
+   * @return true if the component parameter lies within the range: [0-255], false if not.
+   */
+  def validRgbaIntensity(intensity: Int): Boolean = intensity >= 0 && intensity < 256
   private def validPercentage(percentage: Float): Boolean = percentage >= 0f && percentage <= 100f
   private def validHue(hue: Float): Boolean = hue >= 0f && hue <= 360f
   private def validWeight(weight: Float): Boolean = weight >= 0f && weight <= 1f
 
   // factory methods for the javascript library:
+  /**
+   * Factory method to create an RGBA color.  This method validates the parameters and throws
+   * @param red integer value from [0-255] representing the red component in RGB space.
+   * @param green integer value from [0-255] representing the green component in RGB space.
+   * @param blue integer value from [0-255] representing the blue component in RGB space.
+   * @param alpha optional integer value from [0-255] representing the alpha component in RGBA space.  Defaults to 255.
+   * @return an instance of the RGBA class.
+   * @throws ColorComponentOutOfRangeException if one or more of the parameters lies outside of the range [0-255]
+   */
   @JSExport("RGBA") def rgba(red: Int, green: Int, blue: Int, alpha: Int = 255): RGBA = {
-    if (!validRgbComponent(red)) throw ColorComponentOutOfRangeException(f"Red $red outside range [0-255]")
-    if (!validRgbComponent(green)) throw ColorComponentOutOfRangeException(f"Green $green outside range [0-255]")
-    if (!validRgbComponent(blue)) throw ColorComponentOutOfRangeException(f"Blue $blue outside range [0-255]")
-    if (!validRgbComponent(alpha)) throw ColorComponentOutOfRangeException(f"Alpha $alpha outside range [0-255]")
+    if (!validRgbaIntensity(red)) throw ColorComponentOutOfRangeException(f"Red $red outside range [0-255]")
+    if (!validRgbaIntensity(green)) throw ColorComponentOutOfRangeException(f"Green $green outside range [0-255]")
+    if (!validRgbaIntensity(blue)) throw ColorComponentOutOfRangeException(f"Blue $blue outside range [0-255]")
+    if (!validRgbaIntensity(alpha)) throw ColorComponentOutOfRangeException(f"Alpha $alpha outside range [0-255]")
 
     RGBA(red<<16|green<<8|blue|(alpha<<24))
   }
 
+  /**
+   * Factory method for creating instances of the HSV class.  This method validates input parameters and throws an exception
+   * if one or more of them lie outside of their allowed ranges.
+   *
+   * @param saturation an angle ranging from [0-360] degrees.
+   * @param hue a percentage ranging from [0-100].
+   * @param value a percentage ranging from [0-100].
+   * @return an instance of the HSV case class.
+   * @throws ColorComponentOutOfRangeException if one or more of the parameters lies outside of their allowed ranges.
+   */
   @JSExport("HSV") def hsv(hue: Float, saturation: Float, value: Float): HSV = {
     if (!validHue(hue)) throw ColorComponentOutOfRangeException(f"Hue $hue outside range [0-360]")
     if (!validPercentage(saturation)) throw ColorComponentOutOfRangeException(f"Saturation $saturation outside range [0-100]")
@@ -515,6 +920,16 @@ object Color {
     HSV(hue, saturation, value)
   }
 
+  /**
+   * Factory method for creating instances of the HSL class.  This method validates input parameters and throws an exception
+   * if one or more of them lie outside of their allowed ranges.
+   *
+   * @param saturation an angle ranging from [0-360] degrees.
+   * @param hue a percentage ranging from [0-100].
+   * @param lightness a percentage ranging from [0-100].
+   * @return an instance of the HSL case class.
+   * @throws ColorComponentOutOfRangeException if one or more of the parameters lies outside of their allowed ranges.
+   */
   @JSExport("HSL") def hsl(hue: Float, saturation: Float, lightness: Float): HSL = {
     if (!validHue(hue)) throw ColorComponentOutOfRangeException(f"Hue $hue outside range [0-360]")
     if (!validPercentage(saturation)) throw ColorComponentOutOfRangeException(f"Saturation $saturation outside range [0-100]")
@@ -522,6 +937,17 @@ object Color {
     HSL(hue, saturation, lightness)
   }
 
+  /**
+   * Factory method for creating instances of the CMYK class.  This method validates input parameters and throws an exception
+   * if one or more of them lie outside of their allowed ranges.
+   *
+   * @param cyan a value between [0-1]
+   * @param magenta a value between [0-1]
+   * @param yellow a value between [0-1]
+   * @param black a value between [0-1]
+   * @return an instance of the CMYK class.
+   * @throws ColorComponentOutOfRangeException if one or more of the parameters lies outside of their allowed ranges.
+   */
   @JSExport("CMYK") def cmyk(cyan: Float, magenta: Float, yellow: Float, black: Float): CMYK = {
     if (!validWeight(cyan)) throw ColorComponentOutOfRangeException(f"Cyan $cyan outside range [0-1]")
     if (!validWeight(magenta)) throw ColorComponentOutOfRangeException(f"Magenta $magenta outside range [0-1]")
@@ -530,56 +956,39 @@ object Color {
     CMYK(cyan, magenta, yellow, black)
   }
 
+  /**
+   * Factory method to create instances of the XYZ class.  This method does not validate its input parameters.
+   *
+   * @param x the X component of the XYZ color.
+   * @param y the Y component of the XYZ color.
+   * @param z the Z component of the XYZ color.
+   * @return an instance of the XYZ case class.
+   * @example {{{ val c = Color.xyz(22.527,38.820,26.728) }}}
+   */
   @JSExport("XYZ") def xyz(x: Float, y: Float, z: Float): XYZ = XYZ(x, y, z)
 
-  @JSExport("LAB") def lab(l: Float, a: Float, b: Float): LAB = SlowSmallLAB(l, a, b)
+  /**
+   * Factory method to create instances of the LAB class.  This method does not validate its input parameters.
+   *
+   * @param l the L* component of the CIE L*a*b* color.
+   * @param a the a* component of the CIE L*a*b* color.
+   * @param b the b* component of the CIE L*a*b* color.
+   * @return an instance of the SlowSlimLab case class.
+   * @example {{{ val c = Color.lab(72.872, -0.531, 71.770) }}}
+   */
+  @JSExport("LAB") def lab(l: Float, a: Float, b: Float): LAB = SlowSlimLab(l, a, b)
 
-  @JSExport("LUV") def luv(l: Float, u: Float, v: Float): LUV = SlowSmallLUV(l, u, v)
+  /**
+   * Factory method to create instances of the LUV class.  This method does not validate its input parameters.
+   *
+   * @param l the L* component of the CIE L*u*v* color.
+   * @param u the u* component of the CIE L*u*v* color.
+   * @param v the v* component of the CIE L*u*v* color.
+   * @return an instance of the SlowSlimLuv case class.
+   * @example {{{ val c = Color.luv(14.756, -3.756, -58.528) }}}
+   */
+  @JSExport("LUV") def luv(l: Float, u: Float, v: Float): LUV = SlowSlimLuv(l, u, v)
 
 }
 
 case class ColorComponentOutOfRangeException(message: String) extends Exception(message)
-
-object TestColors extends App {
-
-  for (i <- 0 to 100) {
-    val rgba: RGBA = Color.random()
-    val hsl: HSL = rgba
-    val hsv: HSV = rgba
-    println(rgba + " " + hsl + " " + hsv)
-  }
-
-  //  L*a*b* color space extrema:
-  //  L: (-5.5999998E-8, 100.0)
-  //  a: (-86.18464, 98.25422)
-  //  b: (-107.86368, 94.48248)
-
-  //  var lab1: LAB = RGBA(0,255,0,255)
-  //  var lab2: LAB = RGBA(0,0,255,255)
-  //  println(lab1.labDistanceTo(lab2))
-
-  if (false) {
-    var cumulative = 0.0
-    var counter = 0
-
-    val histogram: Array[Int] = Array.fill[Int](260)(0)
-
-    for (i <- 0 to 10000000) {
-      val c1 = Color.toLab(Color.random()).discretize
-      val c2 = Color.toLab(Color.random()).discretize
-      if (c1 != c2) {
-        counter = counter + 1
-        val dist = c1.distanceTo(c2)
-        histogram(dist.toInt) = histogram(dist.toInt) + 1
-        val dM = 83.6 - dist
-        cumulative = cumulative + (dM * dM)
-      }
-    }
-
-    for (i <- histogram) {
-      println(i)
-    }
-
-    println("Standard Deviation of distance between colors: " + Math.sqrt(cumulative / counter) + " Sample Size: " + counter)
-  }
-}
