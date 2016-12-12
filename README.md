@@ -1,7 +1,10 @@
 This cross-published Scala.js library supports conversions between color spaces in both Scala and Javascript.
 
 ##Scala:
-<a href="https://github.com/dragonfly-ai/Color/wiki/Scala-Setup">Scala Setup</a>.<br />
+Please view the
+<a href="https://github.com/dragonfly-ai/Color/wiki/Scala-Setup">Setup</a> and
+<a href="http://dragonfly.ai/docs/scaladoc/color/ai/dragonfly/color/index.html">Documentation</a>
+pages.<br />
 Demo:<br />
 <pre>
 import ai.dragonfly.color._
@@ -28,4 +31,7 @@ integer.toHexString(rgbaInt) // returns "ff23ee8b"
 </pre>
 
 ##Javascript:
-<a href="https://github.com/dragonfly-ai/Color/wiki/Javascript-Setup">Javascript Setup</a>
+Please view the
+<a href="https://github.com/dragonfly-ai/Color/wiki/Javascript-Setup">Setup</a> and 
+<a href="https://github.com/dragonfly-ai/Color/wiki/dragonfly.ai-Color-Javascript-Documentation">Documentation</a>
+pages.<br />
