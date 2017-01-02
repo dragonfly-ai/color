@@ -11,7 +11,7 @@ import ai.dragonfly.color._
 import Color._
 
 // implicit conversions of colors from any color space to any other color space.
-val rgba: RGBA = RGBA(0xFF23EE8b)
+val argb: RGBA = RGBA(0xFF23EE8b)
 rgba.toString //returns "RGBA(35,238,139,255)"
 rgba.hex  // returns "ff23ee8b"
 val lab: LAB = rgba
@@ -26,7 +26,7 @@ val luv: LUV = xyz
 luv.toString  // returns "LUV(83.637,-71.857,59.293)"
 val hsl: HSL = luv
 hsl.toString  // returns "HSL(150.739,85.654,53.529)"
-val rgbaInt: Int = hsl
+val argbInt: Int = hsl
 integer.toHexString(rgbaInt) // returns "ff23ee8b"
 </pre>
 
