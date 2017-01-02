@@ -19,35 +19,35 @@ trait Color {
    * The most significant byte encodes the alpha value, the second most significant byte encodes red,
    * the third most significant byte encodes green, and the least significant byte encodes blue.
    */
-  @JSExport def rgba: Int
+  @JSExport def argb: Int
 
   /**
    * @return the red component of this color in RGB space.
    */
-  @JSExport def red = rgba >> 16 & 0xff
+  @JSExport def red = argb >> 16 & 0xff
   /**
    * @return the green component of this color in RGB space.
    */
-  @JSExport def green = rgba >> 8 & 0xff
+  @JSExport def green = argb >> 8 & 0xff
   /**
    * @return the blue component of this color in RGB space.
    */
-  @JSExport def blue = rgba & 0xff
+  @JSExport def blue = argb & 0xff
   /**
    * @return the alpha component of this color in RGBA space.
    */
-  @JSExport def alpha = rgba >> 24 & 0xff
+  @JSExport def alpha = argb >> 24 & 0xff
 
   /**
-   * @return the hashcode.  For all color types, the hashcode function returns the same result as rgba
+   * @return the hashcode.  For all color types, the hashcode function returns the same result as argb
    */
-  override def hashCode(): Int = rgba
+  override def hashCode(): Int = argb
 
   /**
    * @return true if these colors are equal in RGBA space, false otherwise
    */
   override def equals(o: Any): Boolean = o match {
-    case c: Color => this.rgba == c.rgba
+    case c: Color => this.argb == c.argb
     case _ => false
   }
 
@@ -58,7 +58,7 @@ trait Color {
    * c.hex() // returns "ff4869b7"
    * }}}
    */
-  @JSExport def hex(): String = Integer.toHexString(rgba)
+  @JSExport def hex(): String = Integer.toHexString(argb)
 
   /**
    * @return a string representing the color in an html friendly way.
@@ -67,7 +67,7 @@ trait Color {
    * c.html() // returns "#4869b7"
    * }}}
    */
-  @JSExport def html(): String = "#" + Integer.toHexString(rgba | 0xff000000).substring(2)
+  @JSExport def html(): String = "#" + Integer.toHexString(argb | 0xff000000).substring(2)
 
   /**
    * @return a string representing the color in an SVG friendly way.
@@ -99,7 +99,7 @@ object RGBA {
    * parameter values are derived from the least significant byte.  Integer values that range outside of [0-255] may
    * give unexpected results.  For values taken from user input, sensors, or otherwise uncertain sources, consider using
    * the factory method in the Color companion object.
-   * @see [[ai.dragonfly.color.Color.rgba]] for a method of constructing RGBA objects that validates inputs.
+   * @see [[ai.dragonfly.color.Color.argb]] for a method of constructing RGBA objects that validates inputs.
    * @param red integer value from [0-255] representing the red component in RGB space.
    * @param green integer value from [0-255] representing the green component in RGB space.
    * @param blue integer value from [0-255] representing the blue component in RGB space.
@@ -117,7 +117,7 @@ object RGBA {
  *
  *  @see [[https://en.wikipedia.org/wiki/RGB_color_space]] for more information on the RGB color space.
  *
- *  @param rgba a 32 bit integer that represents this color in RGBA space.
+ *  @param argb a 32 bit integer that represents this color in RGBA space.
  * The most significant byte encodes the alpha value, the second most significant byte encodes red,
  * the third most significant byte encodes green, and the least significant byte encodes blue.
  * @return an instance of the RGBA case class.
@@ -128,7 +128,7 @@ object RGBA {
  * }}}
  */
 @SerialVersionUID(1L)
-case class RGBA(override val rgba: Int) extends Color {
+case class RGBA(override val argb: Int) extends Color {
   /**
    * @return the distance between this color and the parameter in rgb space.
    * Distances exclude alpha information.
@@ -169,7 +169,7 @@ case class RGBA(override val rgba: Int) extends Color {
  */
 @JSExportAll @SerialVersionUID(1L)
 case class HSV(hue: Float, saturation: Float, value: Float) extends Color {
-  override def rgba: Int = Color.toRgba(this)
+  override def argb: Int = Color.toRgba(this)
   @JSExport override def toString() = "HSV(" + f"$hue%1.3f" + "," + f"$saturation%1.3f" + "," + f"$value%1.3f" + ")"
 }
 
@@ -192,7 +192,7 @@ case class HSV(hue: Float, saturation: Float, value: Float) extends Color {
  */
 @JSExportAll @SerialVersionUID(1L)
 case class HSL(hue: Float, saturation: Float, lightness: Float) extends Color {
-  override def rgba: Int = Color.toRgba(this)
+  override def argb: Int = Color.toRgba(this).argb
   override def toString() = "HSL(" + f"$hue%1.3f" + "," + f"$saturation%1.3f" + "," + f"$lightness%1.3f" + ")"
 
   /**
@@ -225,7 +225,7 @@ case class HSL(hue: Float, saturation: Float, lightness: Float) extends Color {
  */
 @JSExportAll @SerialVersionUID(1L)
 case class CMYK(cyan: Float, magenta: Float, yellow: Float, black: Float) extends Color {
-  override def rgba: Int = Color.toRgba(this)
+  override def argb: Int = Color.toRgba(this).argb
   override def toString() = "CMYK(" + f"$cyan%1.3f" + "," + f"$magenta%1.3f" + "," + f"$yellow%1.3f" + "," + f"$black%1.3f" + ")"
 }
 
@@ -266,7 +266,7 @@ object XYZ {
 
 /**
  * The SlowSlimXYZ class stores only the X, Y, and Z components of the XYZ color it encodes while FastFatXYZ also stores
- * an Int representing its RGBA value.
+ * an Int representing its argb value.
  *
  * SlowSlimXYZ requires 4 bytes less memory than FastFatXYZ, however conversions from SlowSlimXYZ to non CIE color spaces:
  * RGB, HSV, HSL, CMYK, require more computational resources than FastFatXYZ.
@@ -284,7 +284,7 @@ object XYZ {
  */
 @SerialVersionUID(1L)
 case class SlowSlimXYZ(override val X: Float, override val Y: Float, override val Z: Float) extends XYZ {
-  override def rgba: Int = this
+  override def argb: Int = this
 }
 
 /**
@@ -298,12 +298,12 @@ case class SlowSlimXYZ(override val X: Float, override val Y: Float, override va
  * @param X the X component of the XYZ color.
  * @param Y the Y component of the XYZ color.
  * @param Z the Z component of the XYZ color.
- * @param rgba a 32 bit integer that represents this color in RGBA space.
+ * @param argb a 32 bit integer that represents this color in RGBA space.
  * @return an instance of the FastFatXYZ case class.
  * @example {{{ val c = FastFatXYZ(22.527, 38.820, 26.728, 0xff00bf80) }}}
  */
 @SerialVersionUID(1L)
-case class FastFatXYZ(override val X: Float, override val Y: Float, override val Z: Float, override val rgba: Int) extends XYZ
+case class FastFatXYZ(override val X: Float, override val Y: Float, override val Z: Float, override val argb: Int) extends XYZ
 
 
 /**
@@ -414,7 +414,7 @@ object LAB {
 
 /**
  * The SlowSlimLab class stores only the L, a, and b components of the CIE L*a*b* color it encodes while FastFatLab also stores
- * an Int representing its RGBA value.
+ * an Int representing its argb value.
  *
  * SlowSlimLab requires 4 bytes less memory than FatFastLab, however conversions from SlowSlimLab to non CIE color spaces:
  * RGB, HSV, HSL, CMYK, require more computational resources than FastFatLab.
@@ -432,8 +432,8 @@ object LAB {
  */
 @SerialVersionUID(1L)
 case class SlowSlimLab(override val L: Float, override val a: Float, override val b: Float) extends LAB {
-  lazy val rgbA: Int = Color.toRgba(this)
-  override def rgba = { rgbA }
+  lazy val _argb: Int = Color.toRgba(this)
+  override def argb = { _argb }
 }
 
 /**
@@ -447,12 +447,12 @@ case class SlowSlimLab(override val L: Float, override val a: Float, override va
  * @param L the L* component of the CIE L*a*b* color.
  * @param a the a* component of the CIE L*a*b* color.
  * @param b the b* component of the CIE L*a*b* color.
- * @param rgba a 32 bit integer that represents this color in RGBA space.
+ * @param argb a 32 bit integer that represents this color in RGBA space.
  * @return an instance of the FastFatLab case class.
  * @example {{{ val c = FastFatLab(70.263, -66.371, 65.333, 0xff31c61c) }}}
  */
 @SerialVersionUID(1L)
-case class FastFatLab(override val L: Float, override val a: Float, override val b: Float, override val rgba: Int) extends LAB
+case class FastFatLab(override val L: Float, override val a: Float, override val b: Float, override val argb: Int) extends LAB
 
 
 /**
@@ -525,7 +525,7 @@ object LUV {
 
 /**
  * The SlowSlimLuv class stores only the L, a, and b components of the CIE L*u*v* color it encodes while FastFatLuv also stores
- * an Int representing its RGBA value.
+ * an Int representing its argb value.
  *
  * SlowSlimLuv requires 4 bytes less memory than FastFatLuv, however conversions from SlowSlimLuv to non CIE color spaces:
  * RGB, HSV, HSL, CMYK, require more computational resources than FastFatLuv.
@@ -543,8 +543,8 @@ object LUV {
  */
 @SerialVersionUID(1L)
 case class SlowSlimLuv(override val L: Float, override val u: Float, override val v: Float) extends LUV {
-  lazy val rgbA: Int = Color.toRgba(this)
-  override def rgba = { rgbA }
+  lazy val _argb: Int = Color.toRgba(this).argb
+  override def argb = { _argb }
 }
 
 /**
@@ -558,12 +558,12 @@ case class SlowSlimLuv(override val L: Float, override val u: Float, override va
  * @param L the L* component of the CIE L*u*v* color.
  * @param u the u* component of the CIE L*u*v* color.
  * @param v the v* component of the CIE L*u*v* color.
- * @param rgba a 32 bit integer that represents this color in RGBA space.
+ * @param argb a 32 bit integer that represents this color in RGBA space.
  * @return an instance of the FastFatLuv case class.
  * @example {{{ val c = FastFatLuv(14.756, -3.756, -58.528, 0xff0a0188) }}}
  */
 @SerialVersionUID(1L)
-case class FastFatLuv(override val L: Float, override val u: Float, override val v: Float, override val rgba: Int) extends LUV
+case class FastFatLuv(override val L: Float, override val u: Float, override val v: Float, override val argb: Int) extends LUV
 
 
 /**
@@ -606,11 +606,11 @@ object Color {
 
   implicit def fromAwtColor(awtColor: java.awt.Color): RGBA = RGBA(awtColor.getRGB)
 
-  implicit def toAwtColor(color: Color): java.awt.Color = new java.awt.Color(color.rgba, true)
+  implicit def toAwtColor(color: Color): java.awt.Color = new java.awt.Color(color.argb, true)
 
-  @JSExport implicit def toRgba(rgba: Int): RGBA = RGBA(rgba)
+  @JSExport implicit def toRgba(argb: Int): RGBA = RGBA(argb)
 
-  @JSExport implicit def toInt(c: Color): Int = c.rgba
+  @JSExport implicit def toInt(c: Color): Int = c.argb
 
   /*
    * For HSL, HSV, and CMYK conversion formulas:
@@ -728,7 +728,7 @@ object Color {
       (R * 0.4124 + G * 0.3576 + B * 0.1805).toFloat,
       (R * 0.2126 + G * 0.7152 + B * 0.0722).toFloat,
       (R * 0.0193 + G * 0.1192 + B * 0.9505).toFloat,
-      c.rgba
+      c.argb
     )
   }
 
@@ -765,7 +765,7 @@ object Color {
       ((116.0 * labY) - 16.0).toFloat,
       (500.0 * (labX - labY)).toFloat,
       (200.0 * (labY - labZ)).toFloat,
-      c.rgba
+      c.argb
     )
   }
 
@@ -786,7 +786,7 @@ object Color {
     val u: Float = (13.0 * L * ( U - ref_U )).toFloat
     val v: Float = (13.0 * L * ( V - ref_V )).toFloat
 
-    FastFatLuv(L, u, v, xyz.rgba)
+    FastFatLuv(L, u, v, xyz.argb)
   }
 
   @JSExport implicit def toXyz (luv: LUV): XYZ = {
@@ -808,10 +808,6 @@ object Color {
   @JSExport implicit def toLuv(c: Color): LUV = toLuv(toXyz(c))
 
   @JSExport implicit def toRgba(luv: LUV): RGBA = toXyz(luv)
-
-  //@JSExport implicit def luvToInt(luv: LUV): Int = luv.rgba
-
-  //@JSExport implicit def intToLuv(rgba: Int): Int = rgbaToLuv(rgba)
 
   // xyz & lab conversion convenience methods:
   private def prepXyz(u: Int): Double = {
@@ -842,7 +838,7 @@ object Color {
    * @return the color resulting from the overlay of c2 on top of c1.
    */
   @JSExport def alphaBlend(c1: RGBA, c2: RGBA): RGBA = {
-    if (c1.alpha >= 255) c1.rgba
+    if (c1.alpha >= 255) c1.argb
     else {
       val w1 = c1.alpha / 255.0
       val w2 = c2.alpha / 255.0
