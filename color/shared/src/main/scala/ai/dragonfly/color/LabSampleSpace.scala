@@ -1,7 +1,6 @@
 package ai.dragonfly.color
 
 import scala.collection.mutable.HashMap
-import ai.dragonfly.color.Color
 
 /**
  * Created by clifton on 1/6/17.
@@ -30,7 +29,7 @@ object LabSampleSpace {
     }
     labSampleSpace
   }
+
   def randomArgb(): Int = sampleSpace((Math.random() * sampleSpace.length).toInt)
 
-  def randomLab(): LAB = Color.toLab(sampleSpace((Math.random() * sampleSpace.length).toInt))
 }

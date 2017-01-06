@@ -581,6 +581,9 @@ object Color {
 
   /**
    * Use Color.random() to obtain a random color in the form of an RGBA instance.
+   * This method executes quickly and without memory costs, but the RGB color space biases toward cool colors.
+   * In contrast, the Color.randomFromLabSpace() method takes seconds to initialize and has a memory footprint of several megabytes
+   * However, it samples from a perceptually uniform color space and avoids the bias toward cool colors.
    * This method samples the Red, Green, and Blue color components uniformly, but always returns 255 for the alpha component.
    * @return a randomly generated color sampled from the RGB Color Space.
    */
@@ -591,6 +594,20 @@ object Color {
       (Math.random() * 255).toInt
     )
   }
+
+  /**
+   * Returns a random color in the form of an RGBA instance.
+   * This method takes seconds to initialize and has a memory footprint of several megabytes.  Once initialized, though, it executes
+   * as fast as Color.random()
+   * Although it samples from a perceptually uniform color space that appears unbiased to the human eye, it samples from a
+   * discritized version of the CEI L*a*b* color space which contains only colors that have integer values for L*, a*, and b*.
+   *
+   * In contrast, the Color.random() executes quickly and without memory costs, but the RGB color space biases toward cool colors.
+   *
+   * This method always returns 255 for the alpha component.
+   * @return a randomly generated color sampled from a discritized version of the CEI L*a*b* color space.
+   */
+  @JSExport def randomFromLabSpace(): RGBA = LabSampleSpace.randomArgb()
 
   /**
    * generate an RGBA instance from a single value.  This method validates the intensity parameter.
