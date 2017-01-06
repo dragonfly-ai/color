@@ -816,7 +816,7 @@ object Color {
   }
 
   private def strikeXyz(v: Double): Int = {
-    val u0 = (Math.pow((v * 0.01), 0.4166666666666667) - 0.05213270142180095) * 269.025
+    val u0 = (Math.pow(v * 0.01, 0.4166666666666667) - 0.05213270142180095) * 269.025
     val u =
       if (u0 > 10.0) u0.toInt
       else (v / 0.03035269835488375).toInt
