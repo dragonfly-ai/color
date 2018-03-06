@@ -484,6 +484,11 @@ trait LUV extends Color {
   }
 
   /**
+    * @return a version of this color with all color components rounded to the nearest integer.
+    */
+  @JSExport def discretize(): LUV = SlowSlimLuv(Math.round(L), Math.round(u), Math.round(v))
+
+  /**
    * This equals method considers two colors equal if they are imperceptibly different from each other.
    * @param o an object to compare to this color.
    * @return true if the parameter is a color and it's squared euclidean distance from this color is less than 0.01 in CIE L*u*v* color space, false otherwise.
@@ -564,7 +569,6 @@ case class SlowSlimLuv(override val L: Float, override val u: Float, override va
  */
 @SerialVersionUID(1L)
 case class FastFatLuv(override val L: Float, override val u: Float, override val v: Float, override val argb: Int) extends LUV
-
 
 /**
  * Color contains convenience methods, fields, and implicit conversion methods.

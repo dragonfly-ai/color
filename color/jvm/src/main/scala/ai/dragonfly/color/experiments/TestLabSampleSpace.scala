@@ -23,6 +23,8 @@ object TestLabSampleSpace extends App {
     }
   }
 
+  println(s"Discritized Lab Space Cardinality: ${LabSampleSpace.sampleSpace.size}")
+
   val tmp = System.getProperty("java.io.tmpdir")
   val timestamp = System.currentTimeMillis()
   ImageIO.write(bi, "PNG", new File(tmp+"/randomImage"+timestamp+"LabSampleSpace.png"))
