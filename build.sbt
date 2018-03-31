@@ -10,6 +10,7 @@ publishTo in ThisBuild := Some(Resolver.file("file",  new File( "/var/www/maven"
 
 val color = crossProject.settings(
   // shared settings
+  //libraryDependencies += "io.suzaku" %%% "boopickle" % "1.2.6"
 ).jsSettings(
   // JS-specific settings here
 ).jvmSettings(

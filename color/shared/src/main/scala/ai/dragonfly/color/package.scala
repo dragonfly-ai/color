@@ -38,6 +38,9 @@ trait Color {
    */
   @JSExport def alpha = argb >> 24 & 0xff
 
+  @JSExport def distanceSquaredTo (c: Color): Double
+
+  @JSExport def distanceTo (c: Color): Double = Math.sqrt(distanceSquaredTo(c))
   /**
    * @return the hashcode.  For all color types, the hashcode function returns the same result as argb
    */
@@ -140,11 +143,11 @@ case class RGBA(override val argb: Int) extends Color {
    * c1.distanceTo(c2) // returns 101.82337649086284
    * }}}
    */
-  @JSExport def distanceTo (c: Color): Double = {
+  @JSExport def distanceSquaredTo (c: Color): Double = {
     var dR = red - c.red; dR = dR * dR
     var dG = green - c.green; dG = dG * dG
     var dB = blue - c.blue; dB = dB * dB
-    Math.sqrt(dR + dG + dB)
+    dR + dG + dB
   }
   override def toString() = "RGBA(" + red + "," + green + "," + blue + "," + alpha + ")"
 }
@@ -171,6 +174,14 @@ case class RGBA(override val argb: Int) extends Color {
 case class HSV(hue: Float, saturation: Float, value: Float) extends Color {
   override def argb: Int = Color.toRgba(this)
   @JSExport override def toString() = "HSV(" + f"$hue%1.3f" + "," + f"$saturation%1.3f" + "," + f"$value%1.3f" + ")"
+
+  @JSExport override def distanceSquaredTo(c: Color): Double = {
+    val c1: HSV = c
+    var dH = hue - c1.hue; dH = dH * dH
+    var dS = saturation - c1.saturation; dS = dS * dS
+    var dV = value - c1.value; dV = dV * dV
+    dH + dS + dV
+  }
 }
 
 /**
@@ -193,6 +204,15 @@ case class HSV(hue: Float, saturation: Float, value: Float) extends Color {
 @JSExportAll @SerialVersionUID(1L)
 case class HSL(hue: Float, saturation: Float, lightness: Float) extends Color {
   override def argb: Int = Color.toRgba(this).argb
+
+  override def distanceSquaredTo(c: Color): Double = {
+    val c1: HSL = c
+    var dH = hue - c1.hue; dH = dH * dH
+    var dS = saturation - c1.saturation; dS = dS * dS
+    var dL = lightness - c1.lightness; dL = dL * dL
+    dH + dS + dL
+  }
+
   override def toString() = "HSL(" + f"$hue%1.3f" + "," + f"$saturation%1.3f" + "," + f"$lightness%1.3f" + ")"
 
   /**
@@ -227,6 +247,15 @@ case class HSL(hue: Float, saturation: Float, lightness: Float) extends Color {
 case class CMYK(cyan: Float, magenta: Float, yellow: Float, black: Float) extends Color {
   override def argb: Int = Color.toRgba(this).argb
   override def toString() = "CMYK(" + f"$cyan%1.3f" + "," + f"$magenta%1.3f" + "," + f"$yellow%1.3f" + "," + f"$black%1.3f" + ")"
+
+  override def distanceSquaredTo(c: Color): Double = {
+    val c1: CMYK = c
+    var dC = cyan - c1.cyan; dC = dC * dC
+    var dM = magenta - c1.magenta; dM = dM * dM
+    var dY = yellow - c1.yellow; dY = dY * dY
+    var dB = black - c1.black; dB = dB * dB
+    dC + dM + dY + dB
+  }
 }
 
 /**
@@ -244,6 +273,14 @@ trait XYZ extends Color {
 
   /** @return the Z component of this color in XYZ space. */
   @JSExport def Z: Float
+
+  override def distanceSquaredTo(c: Color): Double = {
+    val c1: XYZ = c
+    var dX = X - c1.X; dX = dX * dX
+    var dY = Y - c1.Y; dY = dY * dY
+    var dZ = Z - c1.Z; dZ = dZ * dZ
+    dX + dY + dZ
+  }
 
   @JSExport override def toString() = "XYZ(" + f"$X%1.3f" + "," + f"$Y%1.3f" + "," + f"$Z%1.3f" + ")"
 }
@@ -322,10 +359,10 @@ trait LAB extends Color {
   @JSExport def b: Float
 
   /**
-   * @param lab a color
+   * @param c a color
    * @return the euclidean distance, in CIE L*a*b* color space, between this and the color passed as an argument.
    */
-  @JSExport def distanceTo (lab: LAB): Double = LAB.labDistance(this, lab)
+  @JSExport override def distanceSquaredTo (c: Color): Double = LAB.labDistanceSquared(this, c)
 
   /**
    * @param lab a color
@@ -469,10 +506,10 @@ trait LUV extends Color {
   @JSExport def v: Float
 
   /**
-   * @param luv a color
+   * @param c a color
    * @return the euclidean distance, in CIE L*u*v* color space, between this and the color passed as an argument.
    */
-  @JSExport def distanceTo (luv: LUV): Double = LUV.luvDistance(this, luv)
+  @JSExport override def distanceSquaredTo (c: Color): Double = LUV.luvDistanceSquared(this, c)
 
   /**
    * @param luv a color
