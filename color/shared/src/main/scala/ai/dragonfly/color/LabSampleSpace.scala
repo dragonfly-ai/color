@@ -1,11 +1,13 @@
 package ai.dragonfly.color
 
 import scala.collection.mutable.HashMap
+import scala.scalajs.js.annotation.JSExport
 
 /**
  * Created by clifton on 1/6/17.
  */
 
+@JSExport
 object LabSampleSpace {
   lazy val sampleSpace = {
     val distinctColors = new HashMap[Int, Int]()

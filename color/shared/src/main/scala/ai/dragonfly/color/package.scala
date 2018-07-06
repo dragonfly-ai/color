@@ -4,7 +4,6 @@ import scalajs.js
 
 import js.annotation.{JSExport, JSExportAll}
 
-
 /**
  * Created by clifton on 4/24/15.
  */
