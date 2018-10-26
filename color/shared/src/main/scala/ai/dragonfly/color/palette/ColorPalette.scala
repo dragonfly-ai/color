@@ -12,7 +12,7 @@ object ColorPalette {
     * @return an instance of the ColorPalette class.
     * @example {{{ val cp = ColorPalette(histogram) }}}
     */
-  def apply(hist: Map[Color, Int]): ColorPalette = {
+  @JSExport("apply") def apply(hist: Map[Color, Int]): ColorPalette = {
     // Normalize
     val frequencyTotal: Double = totalFrequencies(hist)
     var treeSet = new immutable.TreeSet[ColorFrequency]()

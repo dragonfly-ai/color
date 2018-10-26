@@ -2,9 +2,10 @@ package ai.dragonfly.color.experiments
 
 import java.awt.image.BufferedImage
 import java.io.File
-import javax.imageio.ImageIO
 
-import ai.dragonfly.color.{LabSampleSpace, Color}
+import javax.imageio.ImageIO
+import ai.dragonfly.color.Color
+import ai.dragonfly.color.stats.LabSpace
 
 
 /**
@@ -18,14 +19,13 @@ object TestLabSampleSpace extends App {
 
   for (y <- 0 until bi.getHeight) {
     for (x <- 0 until bi.getWidth) {
-      bi.setRGB(x, y, LabSampleSpace.randomArgb())
+      bi.setRGB(x, y, LabSpace())
       bi1.setRGB(x, y, Color.random())
     }
   }
 
-  println(s"Discritized Lab Space Cardinality: ${LabSampleSpace.sampleSpace.size}")
-
   val tmp = System.getProperty("java.io.tmpdir")
+  println(tmp)
   val timestamp = System.currentTimeMillis()
   ImageIO.write(bi, "PNG", new File(tmp+"/randomImage"+timestamp+"LabSampleSpace.png"))
   ImageIO.write(bi1, "PNG", new File(tmp+"/randomImage"+timestamp+"RgbSampleSpace.png"))

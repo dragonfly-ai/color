@@ -1,8 +1,9 @@
 package ai.dragonfly.color
 
-import scalajs.js
+import ai.dragonfly.color.stats.LabSpace
 
-import js.annotation.{JSExport, JSExportAll}
+import scalajs.js
+import js.annotation.{JSExport, JSExportAll, JSExportTopLevel}
 
 /**
  * Created by clifton on 4/24/15.
@@ -95,6 +96,7 @@ trait Color {
  * Companion object for the RGBA case class.
  */
 
+@JSExportTopLevel("ai.dragonfly.color.RGBA")
 object RGBA {
   /**
    * apply method to create an RGBA instance from separate, specified red, green, blue, and optional alpha components.
@@ -287,6 +289,7 @@ trait XYZ extends Color {
 /**
  * Companion object for SlowSlimXYZ and FastFatXYZ classes.
  */
+@JSExportTopLevel("ai.dragonfly.color.XYZ")
 object XYZ {
   /**
    * apply method to create instances of the SlowSlimXYZ case class.  This method does not validate its input parameters.
@@ -411,15 +414,19 @@ trait LAB extends Color {
 /**
  * Companion object for SlowSlimLAB and FastFatLAB classes.
  */
+@JSExportTopLevel("ai.dragonfly.color.LAB")
 object LAB {
   val L_MAX = 100.0f
   val L_MIN = -5.5999998E-8f
+  val L_AVERAGE = 57.490340794327246
 
   val a_MAX = 98.25422f
   val a_MIN = -86.18464f
+  val a_AVERAGE = 6.988950335808067
 
   val b_MAX = 94.48248f
   val b_MIN = -107.86368f
+  val b_AVERAGE = 3.642550587704847
 
   val EXPECTED_DISTANCE = 83.6f
   val MAX_DISTANCE = 258.6930341882054f
@@ -446,6 +453,8 @@ object LAB {
   def labDistance (lab1: LAB, lab2: LAB): Double = {
     Math.sqrt(labDistanceSquared(lab1, lab2))
   }
+
+  def random(): LAB = LabSpace()
 }
 
 /**
@@ -543,6 +552,7 @@ trait LUV extends Color {
 /**
  * Companion object for SlowSlimLUV and FastFatLUV classes.
  */
+@JSExportTopLevel("ai.dragonfly.color.LUV")
 object LUV {
   /**
    * @param luv1 a color
@@ -609,7 +619,7 @@ case class FastFatLuv(override val L: Float, override val u: Float, override val
 /**
  * Color contains convenience methods, fields, and implicit conversion methods.
  */
-@JSExport("Color")
+@JSExportTopLevel("ai.dragonfly.color.Color")
 object Color {
 
   @JSExport val CLEAR = RGBA(0, 0, 0, 0)
@@ -647,7 +657,7 @@ object Color {
    * This method always returns 255 for the alpha component.
    * @return a randomly generated color sampled from a discritized version of the CEI L*a*b* color space.
    */
-  @JSExport def randomFromLabSpace(): RGBA = LabSampleSpace.randomArgb()
+  @JSExport def randomFromLabSpace(): RGBA = LAB.random()
 
   /**
    * generate an RGBA instance from a single value.  This method validates the intensity parameter.
