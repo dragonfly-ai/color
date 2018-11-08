@@ -3,12 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <title>Color by dragonfly.ai</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script type="text/javascript" src="../color/js/target/scala-2.12/color-fastopt.js"></script>
     <script type="text/javascript">
-        console.log(ai.dragonfly.color.Color.randomFromLabSpace().toString());
+        $(document).ready(function(){
+            var c = ai.dragonfly.color.Color
+
+            var htmlString = "";
+
+            for (var i = 0; i < 50; i = i + 1) {
+                for (var j = 0; j < 100; j = j + 1) {
+                    htmlString = htmlString + "<span style='background-color:" + c.randomFromLabSpace().html() + ";width:20px;height:20px;>&nbsp;&nbsp;&nbsp;&nbsp;</span>";
+                }
+                htmlString = htmlString + "<br />";
+            }
+
+            $("#labColors").html(htmlString);
+        });
     </script>
 </head>
 <body>
-
+<div id="labColors"></div>
 </body>
 </html>

@@ -7,7 +7,6 @@ import javax.imageio.ImageIO
 import ai.dragonfly.color.Color
 import ai.dragonfly.color.stats.LabSpace
 
-
 /**
  * Created by clifton on 1/6/17.
  */
