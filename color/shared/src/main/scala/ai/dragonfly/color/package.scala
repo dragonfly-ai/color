@@ -621,6 +621,7 @@ case class FastFatLuv(override val L: Float, override val u: Float, override val
  */
 @JSExportTopLevel("ai.dragonfly.color.Color")
 object Color {
+  import scala.language.implicitConversions
 
   @JSExport val CLEAR = RGBA(0, 0, 0, 0)
   @JSExport val BLACK = RGBA(0, 0, 0)
