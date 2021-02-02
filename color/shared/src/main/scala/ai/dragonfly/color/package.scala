@@ -96,7 +96,7 @@ trait Color {
  * Companion object for the RGBA case class.
  */
 
-@JSExportTopLevel("ai.dragonfly.color.RGBA")
+@JSExportTopLevel("RGBA")
 object RGBA {
   /**
    * apply method to create an RGBA instance from separate, specified red, green, blue, and optional alpha components.
@@ -174,9 +174,9 @@ case class RGBA(override val argb: Int) extends Color {
 @JSExportAll @SerialVersionUID(1L)
 case class HSV(hue: Float, saturation: Float, value: Float) extends Color {
   override def argb: Int = Color.toRgba(this)
-  @JSExport override def toString() = "HSV(" + f"$hue%1.3f" + "," + f"$saturation%1.3f" + "," + f"$value%1.3f" + ")"
+  override def toString() = "HSV(" + f"$hue%1.3f" + "," + f"$saturation%1.3f" + "," + f"$value%1.3f" + ")"
 
-  @JSExport override def distanceSquaredTo(c: Color): Double = {
+  override def distanceSquaredTo(c: Color): Double = {
     val c1: HSV = c
     var dH = hue - c1.hue; dH = dH * dH
     var dS = saturation - c1.saturation; dS = dS * dS
@@ -289,7 +289,7 @@ trait XYZ extends Color {
 /**
  * Companion object for SlowSlimXYZ and FastFatXYZ classes.
  */
-@JSExportTopLevel("ai.dragonfly.color.XYZ")
+@JSExportTopLevel("XYZ")
 object XYZ {
   /**
    * apply method to create instances of the SlowSlimXYZ case class.  This method does not validate its input parameters.
@@ -414,7 +414,7 @@ trait LAB extends Color {
 /**
  * Companion object for SlowSlimLAB and FastFatLAB classes.
  */
-@JSExportTopLevel("ai.dragonfly.color.LAB")
+@JSExportTopLevel("LAB")
 object LAB {
   val L_MAX = 100.0f
   val L_MIN = -5.5999998E-8f
@@ -552,7 +552,7 @@ trait LUV extends Color {
 /**
  * Companion object for SlowSlimLUV and FastFatLUV classes.
  */
-@JSExportTopLevel("ai.dragonfly.color.LUV")
+@JSExportTopLevel("LUV")
 object LUV {
   /**
    * @param luv1 a color
@@ -619,7 +619,7 @@ case class FastFatLuv(override val L: Float, override val u: Float, override val
 /**
  * Color contains convenience methods, fields, and implicit conversion methods.
  */
-@JSExportTopLevel("ai.dragonfly.color.Color")
+@JSExportTopLevel("Color")
 object Color {
   import scala.language.implicitConversions
 

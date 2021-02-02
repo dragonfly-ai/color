@@ -12,7 +12,7 @@ import scala.scalajs.js.annotation.JSExportTopLevel
  */
 
 
-@JSExportTopLevel("ai.dragonfly.color.stats.LabSpace")
+@JSExportTopLevel("LabSpace")
 object LabSpace {
 
   println("buildTetrahedrons")

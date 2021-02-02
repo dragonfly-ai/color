@@ -1,6 +1,6 @@
 package ai.dragonfly.color.experiments
 
-import ai.dragonfly.color._
+import ai.dragonfly.color.{Color, ColorPalette, LAB}
 
 import scala.collection.immutable
 

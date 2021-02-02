@@ -1,13 +1,18 @@
-import sbtcrossproject.CrossPlugin.autoImport.crossProject
+ThisBuild / scalaVersion := "2.13.3"
 
-val sharedSettings = Seq(
-  version in ThisBuild := "0.2",
-  scalaVersion := "2.12.6",
-  organization in ThisBuild := "ai.dragonfly.code",
-  publishTo in ThisBuild := Some(Resolver.file("file",  new File( "/var/www/maven" )) ),
-  scalacOptions in ThisBuild ++= Seq("-feature"),
-  resolvers in ThisBuild += "dragonfly.ai" at "http://code.dragonfly.ai:8080/",
-  libraryDependencies += "ai.dragonfly.code" %%% "vector" % "0.2"
+lazy val root = project.in(file(".")).aggregate(color.js, color.jvm).settings(
+  publishTo := Some( Resolver.file("file",  new File( "/var/www/maven" ) ) )
 )
 
-lazy val color = crossProject(JSPlatform, JVMPlatform).settings(sharedSettings)
+lazy val color = crossProject(JSPlatform, JVMPlatform).settings(
+  publishTo := Some(Resolver.file("file",  new File( "/var/www/maven" )) ),
+  name := "color",
+  version := "0.2",
+  organization := "ai.dragonfly.code",
+  resolvers += "dragonfly.ai" at "https://code.dragonfly.ai:4343/",
+  libraryDependencies += "ai.dragonfly.code" %%% "vector" % "0.2",
+  scalacOptions ++= Seq("-feature"),
+  mainClass in (Compile, run) := Some("ai.dragonfly.color.experiments.TestColors")
+).jvmSettings().jsSettings(
+  scalaJSUseMainModuleInitializer := true
+)
