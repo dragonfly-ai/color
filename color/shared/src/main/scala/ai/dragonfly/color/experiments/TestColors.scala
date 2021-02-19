@@ -17,7 +17,7 @@ object TestColors extends App {
   for (i <- 0 until 10) {
     val lab: LAB = Color.random()
     val m: LAB = cp.nearestMatch[LAB](lab).color
-    println(lab + " -> " + m + " " + lab.distanceTo(m))
+    println(s"$lab -> $m ${lab.distanceTo(m)}")
   }
 
 }

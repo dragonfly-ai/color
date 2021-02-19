@@ -24,19 +24,19 @@ trait Color {
   /**
    * @return the red component of this color in RGB space.
    */
-  @JSExport def red = argb >> 16 & 0xff
+  @JSExport def red:Int = argb >> 16 & 0xff
   /**
    * @return the green component of this color in RGB space.
    */
-  @JSExport def green = argb >> 8 & 0xff
+  @JSExport def green:Int = argb >> 8 & 0xff
   /**
    * @return the blue component of this color in RGB space.
    */
-  @JSExport def blue = argb & 0xff
+  @JSExport def blue:Int = argb & 0xff
   /**
    * @return the alpha component of this color in RGBA space.
    */
-  @JSExport def alpha = argb >> 24 & 0xff
+  @JSExport def alpha:Int = argb >> 24 & 0xff
 
   @JSExport def distanceSquaredTo (c: Color): Double
 
@@ -150,7 +150,7 @@ case class RGBA(override val argb: Int) extends Color {
     var dB = blue - c.blue; dB = dB * dB
     dR + dG + dB
   }
-  override def toString() = "RGBA(" + red + "," + green + "," + blue + "," + alpha + ")"
+  override def toString:String = "RGBA(" + red + "," + green + "," + blue + "," + alpha + ")"
 }
 
 /**
@@ -174,7 +174,7 @@ case class RGBA(override val argb: Int) extends Color {
 @JSExportAll @SerialVersionUID(1L)
 case class HSV(hue: Float, saturation: Float, value: Float) extends Color {
   override def argb: Int = Color.toRgba(this)
-  override def toString() = "HSV(" + f"$hue%1.3f" + "," + f"$saturation%1.3f" + "," + f"$value%1.3f" + ")"
+  override def toString:String = "HSV(" + f"$hue%1.3f" + "," + f"$saturation%1.3f" + "," + f"$value%1.3f" + ")"
 
   override def distanceSquaredTo(c: Color): Double = {
     val c1: HSV = c
@@ -214,7 +214,7 @@ case class HSL(hue: Float, saturation: Float, lightness: Float) extends Color {
     dH + dS + dL
   }
 
-  override def toString() = "HSL(" + f"$hue%1.3f" + "," + f"$saturation%1.3f" + "," + f"$lightness%1.3f" + ")"
+  override def toString:String = "HSL(" + f"$hue%1.3f" + "," + f"$saturation%1.3f" + "," + f"$lightness%1.3f" + ")"
 
   /**
    * @return a string representing the color in an SVG friendly way.
@@ -247,7 +247,7 @@ case class HSL(hue: Float, saturation: Float, lightness: Float) extends Color {
 @JSExportAll @SerialVersionUID(1L)
 case class CMYK(cyan: Float, magenta: Float, yellow: Float, black: Float) extends Color {
   override def argb: Int = Color.toRgba(this).argb
-  override def toString() = "CMYK(" + f"$cyan%1.3f" + "," + f"$magenta%1.3f" + "," + f"$yellow%1.3f" + "," + f"$black%1.3f" + ")"
+  override def toString:String = "CMYK(" + f"$cyan%1.3f" + "," + f"$magenta%1.3f" + "," + f"$yellow%1.3f" + "," + f"$black%1.3f" + ")"
 
   override def distanceSquaredTo(c: Color): Double = {
     val c1: CMYK = c
@@ -283,7 +283,7 @@ trait XYZ extends Color {
     dX + dY + dZ
   }
 
-  @JSExport override def toString() = "XYZ(" + f"$X%1.3f" + "," + f"$Y%1.3f" + "," + f"$Z%1.3f" + ")"
+  @JSExport override def toString:String = "XYZ(" + f"$X%1.3f" + "," + f"$Y%1.3f" + "," + f"$Z%1.3f" + ")"
 }
 
 /**
@@ -385,7 +385,7 @@ trait LAB extends Color {
   /**
    * @return a version of this color with all color components rounded to the nearest integer.
    */
-  @JSExport def discretize(): LAB = SlowSlimLab(Math.round(L), Math.round(a), Math.round(b))
+  @JSExport def discretize(): LAB = SlowSlimLab(Math.round(L).toFloat, Math.round(a).toFloat, Math.round(b).toFloat)
 
   /**
    * @param r a color
@@ -393,7 +393,7 @@ trait LAB extends Color {
    * with grid cell dimensions = r X r X r.
    */
   @JSExport def discretize(r: Float): LAB = {
-    SlowSlimLab(Math.round(L/r)*r, Math.round(a/r)*r, Math.round(b/r)*r)
+    SlowSlimLab(Math.round(L/r).toFloat*r, Math.round(a/r).toFloat*r, Math.round(b/r).toFloat*r)
   }
 
   /**
@@ -408,7 +408,7 @@ trait LAB extends Color {
     }
   }
 
-  @JSExport override def toString() = "LAB(" + f"$L%1.3f" + "," + f"$a%1.3f" + "," + f"$b%1.3f" + ")"
+  @JSExport override def toString:String = "LAB(" + f"$L%1.3f" + "," + f"$a%1.3f" + "," + f"$b%1.3f" + ")"
 }
 
 /**
@@ -416,22 +416,22 @@ trait LAB extends Color {
  */
 @JSExportTopLevel("LAB")
 object LAB {
-  val L_MAX = 100.0f
-  val L_MIN = -5.5999998E-8f
-  val L_AVERAGE = 57.490340794327246
+  val L_MAX:Float = 100.0f
+  val L_MIN:Float = -5.5999998E-8f
+  val L_AVERAGE:Float = 57.490340794327246f
 
-  val a_MAX = 98.25422f
-  val a_MIN = -86.18464f
-  val a_AVERAGE = 6.988950335808067
+  val a_MAX:Float = 98.25422f
+  val a_MIN:Float = -86.18464f
+  val a_AVERAGE:Float = 6.988950335808067f
 
-  val b_MAX = 94.48248f
-  val b_MIN = -107.86368f
-  val b_AVERAGE = 3.642550587704847
+  val b_MAX:Float = 94.48248f
+  val b_MIN:Float = -107.86368f
+  val b_AVERAGE:Float = 3.642550587704847f
 
-  val EXPECTED_DISTANCE = 83.6f
-  val MAX_DISTANCE = 258.6930341882054f
-  val STANDARD_DEVIATION_NORMAL = 41f
-  val STANDARD_DEVIATION_POISSON = 9.14f
+  val EXPECTED_DISTANCE:Float = 83.6f
+  val MAX_DISTANCE:Float = 258.6930341882054f
+  val STANDARD_DEVIATION_NORMAL:Float = 41f
+  val STANDARD_DEVIATION_POISSON:Float = 9.14f
 
   /**
    * @param lab1 a color
@@ -478,7 +478,7 @@ object LAB {
 @SerialVersionUID(1L)
 case class SlowSlimLab(override val L: Float, override val a: Float, override val b: Float) extends LAB {
   lazy val _argb: Int = Color.toRgba(this)
-  override def argb = { _argb }
+  override def argb:Int = { _argb }
 }
 
 /**
@@ -531,7 +531,7 @@ trait LUV extends Color {
   /**
     * @return a version of this color with all color components rounded to the nearest integer.
     */
-  @JSExport def discretize(): LUV = SlowSlimLuv(Math.round(L), Math.round(u), Math.round(v))
+  @JSExport def discretize(): LUV = SlowSlimLuv(Math.round(L).toFloat, Math.round(u).toFloat, Math.round(v).toFloat)
 
   /**
    * This equals method considers two colors equal if they are imperceptibly different from each other.
@@ -545,7 +545,7 @@ trait LUV extends Color {
     }
   }
 
-  @JSExport override def toString() = "LUV(" + f"$L%1.3f" + "," + f"$u%1.3f" + "," + f"$v%1.3f" + ")"
+  @JSExport override def toString:String = "LUV(" + f"$L%1.3f" + "," + f"$u%1.3f" + "," + f"$v%1.3f" + ")"
 
 }
 
@@ -595,7 +595,7 @@ object LUV {
 @SerialVersionUID(1L)
 case class SlowSlimLuv(override val L: Float, override val u: Float, override val v: Float) extends LUV {
   lazy val _argb: Int = Color.toRgba(this).argb
-  override def argb = { _argb }
+  override def argb:Int = { _argb }
 }
 
 /**
@@ -623,12 +623,12 @@ case class FastFatLuv(override val L: Float, override val u: Float, override val
 object Color {
   import scala.language.implicitConversions
 
-  @JSExport val CLEAR = RGBA(0, 0, 0, 0)
-  @JSExport val BLACK = RGBA(0, 0, 0)
-  @JSExport val WHITE = RGBA(255, 255, 255)
-  @JSExport val GRAY = RGBA(128, 128, 128)
-  @JSExport val DARK_GRAY = gray(64)
-  @JSExport val LIGHT_GRAY = gray(192)
+  @JSExport val CLEAR: Color = RGBA(0, 0, 0, 0)
+  @JSExport val BLACK: Color = RGBA(0, 0, 0)
+  @JSExport val WHITE: Color = RGBA(255, 255, 255)
+  @JSExport val GRAY: Color = RGBA(128, 128, 128)
+  @JSExport val DARK_GRAY: Color = gray(64)
+  @JSExport val LIGHT_GRAY: Color = gray(192)
 
   /**
    * Use Color.random() to obtain a random color in the form of an RGBA instance.
@@ -776,9 +776,9 @@ object Color {
 
   @JSExport implicit def toRgba(cmyk: CMYK): RGBA = {
     RGBA(
-      Math.round(255 * (1 - cmyk.cyan) * (1 - cmyk.black)).toInt,
-      Math.round(255 * (1 - cmyk.magenta) * (1 - cmyk.black)).toInt,
-      Math.round(255 * (1 - cmyk.yellow) * (1 - cmyk.black)).toInt
+      Math.round(255 * (1 - cmyk.cyan) * (1 - cmyk.black)),
+      Math.round(255 * (1 - cmyk.magenta) * (1 - cmyk.black)),
+      Math.round(255 * (1 - cmyk.yellow) * (1 - cmyk.black))
     )
   }
 
