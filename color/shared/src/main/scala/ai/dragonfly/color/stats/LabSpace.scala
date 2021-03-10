@@ -1,7 +1,7 @@
 package ai.dragonfly.color.stats
 
 import ai.dragonfly.color.{LAB, RGBA, SlowSlimLab}
-import ai.dragonfly.math.stats.mesh.Tetrahedron
+import ai.dragonfly.math.stats.geometry.Tetrahedron
 import ai.dragonfly.math.vector.Vector3
 
 import scala.collection.mutable
@@ -126,9 +126,8 @@ object LabSpace {
     val x = Math.random() * totalVolume
     val i = getNearestIndex(x)
 
-    val v = tetrahedrons(i).draw()
+    val v = tetrahedrons(i).random()
     SlowSlimLab(v.x.toFloat, v.y.toFloat, v.z.toFloat)
-
   }
 
 }

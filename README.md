@@ -3,7 +3,7 @@ This cross-published Scala.js library supports conversions between color spaces 
 ##Scala:
 Please view the
 <a href="https://github.com/dragonfly-ai/Color/wiki/Scala-Setup">Setup</a> and
-<a href="http://dragonfly.ai/doc/color/2.13/0.201/ai/dragonfly/color/index.html">Documentation</a>
+<a href="http://dragonfly.ai/doc/color/2.13/0.202/ai/dragonfly/color/index.html">Documentation</a>
 pages.<br />
 Demo:<br />
 <pre>
