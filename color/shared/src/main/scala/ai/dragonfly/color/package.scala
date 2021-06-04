@@ -96,7 +96,6 @@ trait Color {
  * Companion object for the RGBA case class.
  */
 
-@JSExportTopLevel("RGBA")
 object RGBA {
   /**
    * apply method to create an RGBA instance from separate, specified red, green, blue, and optional alpha components.
@@ -131,7 +130,7 @@ object RGBA {
  * RGBA(0xFF0000FF).toString() // returns "RGBA(255,0,0,255)"
  * }}}
  */
-@SerialVersionUID(1L)
+@JSExportAll
 case class RGBA(override val argb: Int) extends Color {
   /**
    * @return the distance between this color and the parameter in rgb space.
@@ -144,7 +143,7 @@ case class RGBA(override val argb: Int) extends Color {
    * c1.distanceTo(c2) // returns 101.82337649086284
    * }}}
    */
-  @JSExport def distanceSquaredTo (c: Color): Double = {
+  def distanceSquaredTo (c: Color): Double = {
     var dR = red - c.red; dR = dR * dR
     var dG = green - c.green; dG = dG * dG
     var dB = blue - c.blue; dB = dB * dB
@@ -171,7 +170,7 @@ case class RGBA(override val argb: Int) extends Color {
  * c.toString()  // returns "HSV(211.000,75.000,33.333)"
  * }}}
  */
-@JSExportAll @SerialVersionUID(1L)
+@JSExportAll
 case class HSV(hue: Float, saturation: Float, value: Float) extends Color {
   override def argb: Int = Color.toRgba(this)
   override def toString:String = "HSV(" + f"$hue%1.3f" + "," + f"$saturation%1.3f" + "," + f"$value%1.3f" + ")"
