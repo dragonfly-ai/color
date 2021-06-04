@@ -1,7 +1,5 @@
 package ai.dragonfly.color
 
-import ai.dragonfly.nativize._
-
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExportTopLevel
 
@@ -16,8 +14,6 @@ package object native {
       case _ => throw js.JavaScriptException( InvalidArgumentsException( s"required 1, 3, or 4 numbers, received: ${args.length}" ) )
     }
   }
-
-  val scope:js.Dynamic = factoryJS(RGBA _)
 }
 
 case class InvalidArgumentsException(msg:String) extends Exception {
