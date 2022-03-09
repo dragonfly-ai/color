@@ -1,14 +1,42 @@
 This cross-published Scala.js library supports conversions between color spaces in both Scala and Javascript.
 
+In addition to support for common color spaces: RGB, RGBA, HSV, HSL, and CYMK, this library
+also provides convenient access to color spaces designed around human color
+perception research, such as XYZ, L* a* b*, and L* u* v*.   
+
+Its most unique feature provides random sampling of colors from the L* a* b* color space.
+
+In many situations, we might need to generate a random color.  Generally, developers simply combine three
+8-bit integers corresponding to the red, green, and blue values of the 24 bit, RGB color space.  While
+easy to implement, this method suffers from the weaknesses implicit in the RGB color cube, most notably
+that common similarity measures, usually some derivative of 3D Euclidian distance in RGB space, reflect
+electromagnetic properties like frequency and intensity.  Unfortunately, human color perception has
+highly non linear properties compared to the measurable properties of light.
+
+On average, human vision systems perceive random samples from RGB to over represent shades of green, blue, and
+magenta, leaving yellow, orange, and red relatively less expressed.  When we look at an image comprised of pixels
+with independently randomized colors, we might expect to see an image resembling a scramble picture of a rainbow.
+However, when sampling from RGB space, most people experience such images as biased toward cool colors.
+
+![Image of Randomized Colors Sampled from RGB Space.](https://github.com/dragonfly-ai/color/blob/master/RGB.png "Image of Randomized Colors Sampled from RGB Space.")
+
+By contrast, by sampling from L* a* b* color space, most people experience this kind of image as a scrambled rainbow.
+![Image of Randomized Colors Sampled from L* a* b* Space.](https://github.com/dragonfly-ai/color/blob/master/L*a*b*.png "Image of Randomized Colors Sampled from L* a* b* Space.")
+
+On a more practical basis, we often rely on random colors to distinguish two separate features in various data visualizations.
+Sampling from RGB space is more likely to yield colors that differ significantly in intensity or frequency, but look the same
+to the people looking at them.  By uniformly sampling from L* a* b* color space instead, we increase the likelihood that
+any two colors look different from each other to the people who look at them.
+
 ##Scala:
 Please view the
 <a href="https://github.com/dragonfly-ai/Color/wiki/Scala-Setup">Setup</a> and
-<a href="http://dragonfly.ai/doc/color/2.13/0.202/ai/dragonfly/color/index.html">Documentation</a>
-pages.<br />
+<a href="http://dragonfly.ai/doc/color/2.13/0.202/ai/dragonfly/color/index.html">Documentation</a> pages.<br />
+
 Demo:<br />
 <pre>
-import ai.dragonfly.color._
-import Color._
+import ai.dragonfly.color.*
+import Color.*
 
 // implicit conversions of colors from any color space to any other color space.
 val argb: RGBA = RGBA(0xFF23EE8b)
