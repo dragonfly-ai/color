@@ -2,9 +2,6 @@ package ai.dragonfly.color
 
 import ai.dragonfly.color.stats.LabSpace
 
-import scalajs.js
-import js.annotation.{JSExport, JSExportAll, JSExportTopLevel}
-
 /**
  * Created by clifton on 4/24/15.
  */
@@ -19,28 +16,28 @@ trait Color {
    * The most significant byte encodes the alpha value, the second most significant byte encodes red,
    * the third most significant byte encodes green, and the least significant byte encodes blue.
    */
-  @JSExport def argb: Int
+  def argb: Int
 
   /**
    * @return the red component of this color in RGB space.
    */
-  @JSExport def red:Int = argb >> 16 & 0xff
+  def red:Int = argb >> 16 & 0xff
   /**
    * @return the green component of this color in RGB space.
    */
-  @JSExport def green:Int = argb >> 8 & 0xff
+  def green:Int = argb >> 8 & 0xff
   /**
    * @return the blue component of this color in RGB space.
    */
-  @JSExport def blue:Int = argb & 0xff
+  def blue:Int = argb & 0xff
   /**
    * @return the alpha component of this color in RGBA space.
    */
-  @JSExport def alpha:Int = argb >> 24 & 0xff
+  def alpha:Int = argb >> 24 & 0xff
 
-  @JSExport def distanceSquaredTo (c: Color): Double
+  def distanceSquaredTo (c: Color): Double
 
-  @JSExport def distanceTo (c: Color): Double = Math.sqrt(distanceSquaredTo(c))
+  def distanceTo (c: Color): Double = Math.sqrt(distanceSquaredTo(c))
   /**
    * @return the hashcode.  For all color types, the hashcode function returns the same result as argb
    */
@@ -61,7 +58,7 @@ trait Color {
    * c.hex() // returns "ff4869b7"
    * }}}
    */
-  @JSExport def hex(): String = Integer.toHexString(argb)
+  def hex(): String = Integer.toHexString(argb)
 
   /**
    * @return a string representing the color in an html friendly way.
@@ -70,7 +67,7 @@ trait Color {
    * c.html() // returns "#4869b7"
    * }}}
    */
-  @JSExport def html(): String = "#" + Integer.toHexString(argb | 0xff000000).substring(2)
+  def html(): String = "#" + Integer.toHexString(argb | 0xff000000).substring(2)
 
   /**
    * @return a string representing the color in an SVG friendly way.
@@ -86,7 +83,7 @@ trait Color {
    * c.svg() // returns "rgba(72,105,183,0.501960813999176)"
    * }}}
    */
-  @JSExport def svg(): String = {
+  def svg(): String = {
     if (alpha < 255) "rgba(" + red + "," + green + "," + blue + "," + (alpha / 255f) + ")"
     else "rgb(" + red + "," + green + "," + blue + ")"
   }
@@ -130,7 +127,7 @@ object RGBA {
  * RGBA(0xFF0000FF).toString() // returns "RGBA(255,0,0,255)"
  * }}}
  */
-@JSExportAll
+
 case class RGBA(override val argb: Int) extends Color {
   /**
    * @return the distance between this color and the parameter in rgb space.
@@ -170,7 +167,7 @@ case class RGBA(override val argb: Int) extends Color {
  * c.toString()  // returns "HSV(211.000,75.000,33.333)"
  * }}}
  */
-@JSExportAll
+
 case class HSV(hue: Float, saturation: Float, value: Float) extends Color {
   override def argb: Int = Color.toRgba(this)
   override def toString:String = "HSV(" + f"$hue%1.3f" + "," + f"$saturation%1.3f" + "," + f"$value%1.3f" + ")"
@@ -201,7 +198,7 @@ case class HSV(hue: Float, saturation: Float, value: Float) extends Color {
  * c.toString()  // returns "HSL(211.000,75.000,33.333)"
  * }}}
  */
-@JSExportAll @SerialVersionUID(1L)
+ @SerialVersionUID(1L)
 case class HSL(hue: Float, saturation: Float, lightness: Float) extends Color {
   override def argb: Int = Color.toRgba(this).argb
 
@@ -243,7 +240,7 @@ case class HSL(hue: Float, saturation: Float, lightness: Float) extends Color {
  * c.toString()  // returns "CMYK(1.000,0.250,0.500,0.000)"
  * }}}
  */
-@JSExportAll @SerialVersionUID(1L)
+ @SerialVersionUID(1L)
 case class CMYK(cyan: Float, magenta: Float, yellow: Float, black: Float) extends Color {
   override def argb: Int = Color.toRgba(this).argb
   override def toString:String = "CMYK(" + f"$cyan%1.3f" + "," + f"$magenta%1.3f" + "," + f"$yellow%1.3f" + "," + f"$black%1.3f" + ")"
@@ -266,13 +263,13 @@ case class CMYK(cyan: Float, magenta: Float, yellow: Float, black: Float) extend
  */
 trait XYZ extends Color {
   /** @return the X component of this color in XYZ space. */
-  @JSExport def X: Float
+  def X: Float
 
   /** @return the Y component of this color in XYZ space. */
-  @JSExport def Y: Float
+  def Y: Float
 
   /** @return the Z component of this color in XYZ space. */
-  @JSExport def Z: Float
+  def Z: Float
 
   override def distanceSquaredTo(c: Color): Double = {
     val c1: XYZ = c
@@ -282,13 +279,13 @@ trait XYZ extends Color {
     dX + dY + dZ
   }
 
-  @JSExport override def toString:String = "XYZ(" + f"$X%1.3f" + "," + f"$Y%1.3f" + "," + f"$Z%1.3f" + ")"
+  override def toString:String = "XYZ(" + f"$X%1.3f" + "," + f"$Y%1.3f" + "," + f"$Z%1.3f" + ")"
 }
 
 /**
  * Companion object for SlowSlimXYZ and FastFatXYZ classes.
  */
-@JSExportTopLevel("XYZ")
+
 object XYZ {
   /**
    * apply method to create instances of the SlowSlimXYZ case class.  This method does not validate its input parameters.
@@ -351,25 +348,25 @@ case class FastFatXYZ(override val X: Float, override val Y: Float, override val
  */
 trait LAB extends Color {
   /** @return the L* component of this color in CIE L*a*b* color space. */
-  @JSExport def L: Float
+  def L: Float
 
   /** @return the a* component of this color in CIE L*a*b* color space. */
-  @JSExport def a: Float
+  def a: Float
 
   /** @return the a* component of this color in CIE L*a*b* color space. */
-  @JSExport def b: Float
+  def b: Float
 
   /**
    * @param c a color
    * @return the euclidean distance, in CIE L*a*b* color space, between this and the color passed as an argument.
    */
-  @JSExport override def distanceSquaredTo (c: Color): Double = LAB.labDistanceSquared(this, c)
+  override def distanceSquaredTo (c: Color): Double = LAB.labDistanceSquared(this, c)
 
   /**
    * @param lab a color
    * @return the distance, in CIE L*a*b* color space, between the brightness of this color and the brightness of the color passed as an argument.
    */
-  @JSExport def valueDistanceTo(lab: LAB): Double = {
+  def valueDistanceTo(lab: LAB): Double = {
     val dL = L - lab.L
     Math.sqrt(dL * dL)
   }
@@ -384,14 +381,14 @@ trait LAB extends Color {
   /**
    * @return a version of this color with all color components rounded to the nearest integer.
    */
-  @JSExport def discretize(): LAB = SlowSlimLab(Math.round(L).toFloat, Math.round(a).toFloat, Math.round(b).toFloat)
+  def discretize(): LAB = SlowSlimLab(Math.round(L).toFloat, Math.round(a).toFloat, Math.round(b).toFloat)
 
   /**
    * @param r a color
    * @return a version of this color with all color components rounded to the nearest coordinate in a uniform, three dimensional, grid
    * with grid cell dimensions = r X r X r.
    */
-  @JSExport def discretize(r: Float): LAB = {
+  def discretize(r: Float): LAB = {
     SlowSlimLab(Math.round(L/r).toFloat*r, Math.round(a/r).toFloat*r, Math.round(b/r).toFloat*r)
   }
 
@@ -400,20 +397,20 @@ trait LAB extends Color {
    * @param o an object to compare to this color.
    * @return true if the parameter is a color and it's squared euclidean distance from this color is less than 0.01 in CIE L*a*b* color space, false otherwise.
    */
-  @JSExport override def equals(o: Any): Boolean = {
+  override def equals(o: Any): Boolean = {
     o match {
       case lab: LAB => LAB.labDistanceSquared(this, lab) < 0.01
       case _ => false
     }
   }
 
-  @JSExport override def toString:String = "LAB(" + f"$L%1.3f" + "," + f"$a%1.3f" + "," + f"$b%1.3f" + ")"
+  override def toString:String = "LAB(" + f"$L%1.3f" + "," + f"$a%1.3f" + "," + f"$b%1.3f" + ")"
 }
 
 /**
  * Companion object for SlowSlimLAB and FastFatLAB classes.
  */
-@JSExportTopLevel("LAB")
+
 object LAB {
   val L_MAX:Float = 100.0f
   val L_MIN:Float = -5.5999998E-8f
@@ -506,23 +503,23 @@ case class FastFatLab(override val L: Float, override val a: Float, override val
  */
 trait LUV extends Color {
   /** @return the L* component of this color in CIE L*u*v* color space. */
-  @JSExport def L: Float
+  def L: Float
   /** @return the u* component of this color in CIE L*u*v* color space. */
-  @JSExport def u: Float
+  def u: Float
   /** @return the u* component of this color in CIE L*u*v* color space. */
-  @JSExport def v: Float
+  def v: Float
 
   /**
    * @param c a color
    * @return the euclidean distance, in CIE L*u*v* color space, between this and the color passed as an argument.
    */
-  @JSExport override def distanceSquaredTo (c: Color): Double = LUV.luvDistanceSquared(this, c)
+  override def distanceSquaredTo (c: Color): Double = LUV.luvDistanceSquared(this, c)
 
   /**
    * @param luv a color
    * @return the distance, in CIE L*u*v* color space, between the brightness of this color and the brightness of the color passed as an argument.
    */
-  @JSExport def valueDistanceTo(luv: LUV): Double = {
+  def valueDistanceTo(luv: LUV): Double = {
     val dL = L - luv.L
     Math.sqrt(dL * dL)
   }
@@ -530,28 +527,28 @@ trait LUV extends Color {
   /**
     * @return a version of this color with all color components rounded to the nearest integer.
     */
-  @JSExport def discretize(): LUV = SlowSlimLuv(Math.round(L).toFloat, Math.round(u).toFloat, Math.round(v).toFloat)
+  def discretize(): LUV = SlowSlimLuv(Math.round(L).toFloat, Math.round(u).toFloat, Math.round(v).toFloat)
 
   /**
    * This equals method considers two colors equal if they are imperceptibly different from each other.
    * @param o an object to compare to this color.
    * @return true if the parameter is a color and it's squared euclidean distance from this color is less than 0.01 in CIE L*u*v* color space, false otherwise.
    */
-  @JSExport override def equals(o: Any): Boolean = {
+  override def equals(o: Any): Boolean = {
     o match {
       case luv: LUV => LUV.luvDistanceSquared(this, luv) < 0.01
       case _ => false
     }
   }
 
-  @JSExport override def toString:String = "LUV(" + f"$L%1.3f" + "," + f"$u%1.3f" + "," + f"$v%1.3f" + ")"
+  override def toString:String = "LUV(" + f"$L%1.3f" + "," + f"$u%1.3f" + "," + f"$v%1.3f" + ")"
 
 }
 
 /**
  * Companion object for SlowSlimLUV and FastFatLUV classes.
  */
-@JSExportTopLevel("LUV")
+
 object LUV {
   /**
    * @param luv1 a color
@@ -618,16 +615,16 @@ case class FastFatLuv(override val L: Float, override val u: Float, override val
 /**
  * Color contains convenience methods, fields, and implicit conversion methods.
  */
-@JSExportTopLevel("Color")
+
 object Color {
   import scala.language.implicitConversions
 
-  @JSExport val CLEAR: Color = RGBA(0, 0, 0, 0)
-  @JSExport val BLACK: Color = RGBA(0, 0, 0)
-  @JSExport val WHITE: Color = RGBA(255, 255, 255)
-  @JSExport val GRAY: Color = RGBA(128, 128, 128)
-  @JSExport val DARK_GRAY: Color = gray(64)
-  @JSExport val LIGHT_GRAY: Color = gray(192)
+  val CLEAR: Color = RGBA(0, 0, 0, 0)
+  val BLACK: Color = RGBA(0, 0, 0)
+  val WHITE: Color = RGBA(255, 255, 255)
+  val GRAY: Color = RGBA(128, 128, 128)
+  val DARK_GRAY: Color = gray(64)
+  val LIGHT_GRAY: Color = gray(192)
 
   /**
    * Use Color.random() to obtain a random color in the form of an RGBA instance.
@@ -637,7 +634,7 @@ object Color {
    * This method samples the Red, Green, and Blue color components uniformly, but always returns 255 for the alpha component.
    * @return a randomly generated color sampled from the RGB Color Space.
    */
-  @JSExport def random(): RGBA = {
+  def random(): RGBA = {
     RGBA(
       (Math.random() * 255).toInt,
       (Math.random() * 255).toInt,
@@ -657,7 +654,7 @@ object Color {
    * This method always returns 255 for the alpha component.
    * @return a randomly generated color sampled from a discritized version of the CEI L*a*b* color space.
    */
-  @JSExport def randomFromLabSpace(): RGBA = LAB.random()
+  def randomFromLabSpace(): RGBA = LAB.random()
 
   /**
    * generate an RGBA instance from a single value.  This method validates the intensity parameter.
@@ -666,7 +663,7 @@ object Color {
    * @return an RGBA instance encoding the desired grayscale intensity.
    * @throws ColorComponentOutOfRangeException if intensity escapes the range [0-255].
    */
-  @JSExport def gray(intensity: Int): RGBA = {
+  def gray(intensity: Int): RGBA = {
     if (validRgbaIntensity(intensity)) RGBA(intensity, intensity, intensity)
     else throw ColorComponentOutOfRangeException(f"Intensity $intensity outside range [0-255]")
   }
@@ -675,9 +672,9 @@ object Color {
 
   implicit def toAwtColor(color: Color): java.awt.Color = new java.awt.Color(color.argb, true)
 
-  @JSExport implicit def toRgba(argb: Int): RGBA = RGBA(argb)
+  implicit def toRgba(argb: Int): RGBA = RGBA(argb)
 
-  @JSExport implicit def toInt(c: Color): Int = c.argb
+  implicit def toInt(c: Color): Int = c.argb
 
   /*
    * For HSL, HSV, and CMYK conversion formulas:
@@ -730,19 +727,19 @@ object Color {
     C * ( 1 - Math.abs( hh % 2 - 1 ) )
   }
 
-  @JSExport implicit def toHsv(c: Color): HSV = {
+  implicit def toHsv(c: Color): HSV = {
     val hmm = colorToHueMaxMin(c)
     HSV(hmm.hue, 100 * (hmm.cMax - hmm.cMin) / hmm.cMax,  100f * hmm.cMax)
   }
 
-  @JSExport implicit def toRgba (hsv: HSV): RGBA = {
+  implicit def toRgba (hsv: HSV): RGBA = {
     val C = (hsv.value / 100f) * (hsv.saturation / 100f)  // X
     val X = hcToX(hsv.hue, C)
     val m = (hsv.value / 100f) - C
     hueCxmToRgba( HueCXM( hsv.hue, C, X, m ) )
   }
 
-  @JSExport implicit def toHsl(c: Color): HSL = {
+  implicit def toHsl(c: Color): HSL = {
     val hmm = colorToHueMaxMin(c)
     val delta = hmm.cMax - hmm.cMin
     val L = (hmm.cMax + hmm.cMin) / 2f
@@ -751,14 +748,14 @@ object Color {
     HSL(hmm.hue,  100f * S,  100f * L)
   }
 
-  @JSExport implicit def toRgba (hsl: HSL): RGBA = {
+  implicit def toRgba (hsl: HSL): RGBA = {
     val C = (1 - Math.abs(2f*(hsl.lightness / 100f) - 1f)) * (hsl.saturation / 100f)
     val X = hcToX(hsl.hue, C)
     val m = (hsl.lightness / 100f) - (C / 2f)
     hueCxmToRgba( HueCXM( hsl.hue, C, X, m ) )
   }
 
-  @JSExport implicit def toCmyk(c: Color): CMYK = {
+  implicit def toCmyk(c: Color): CMYK = {
     //  1/255 = 0.00392156862745098
     val r = c.red * 0.00392156862745098f
     val g = c.green * 0.00392156862745098f
@@ -773,7 +770,7 @@ object Color {
     CMYK(C, M, Y, K)
   }
 
-  @JSExport implicit def toRgba(cmyk: CMYK): RGBA = {
+  implicit def toRgba(cmyk: CMYK): RGBA = {
     RGBA(
       Math.round(255 * (1 - cmyk.cyan) * (1 - cmyk.black)),
       Math.round(255 * (1 - cmyk.magenta) * (1 - cmyk.black)),
@@ -786,7 +783,7 @@ object Color {
    * http://www.easyrgb.com/index.php?X=MATH
    */
 
-  @JSExport implicit def toXyz(c: Color): XYZ = {
+  implicit def toXyz(c: Color): XYZ = {
     val R = prepXyz(c.red)
     val G = prepXyz(c.green)
     val B = prepXyz(c.blue)
@@ -799,7 +796,7 @@ object Color {
     )
   }
 
-  @JSExport implicit def toRgba (xyz: XYZ): RGBA = {
+  implicit def toRgba (xyz: XYZ): RGBA = {
     RGBA(
       strikeXyz(xyz.X * 3.24065 + xyz.Y * -1.5372 + xyz.Z * -0.4986),
       strikeXyz(xyz.X * -0.9689 + xyz.Y * 1.87585 + xyz.Z * 0.04155),
@@ -807,7 +804,7 @@ object Color {
     )
   }
 
-  @JSExport implicit def toXyz(lab: LAB): XYZ = {
+  implicit def toXyz(lab: LAB): XYZ = {
     val labY = (lab.L + 16.0) / 116.0
 
     SlowSlimXYZ(
@@ -817,9 +814,9 @@ object Color {
     )
   }
 
-  @JSExport implicit def toRgba(lab: LAB): RGBA = toXyz(lab)
+  implicit def toRgba(lab: LAB): RGBA = toXyz(lab)
 
-  @JSExport implicit def toLab(c: Color): LAB = {
+  implicit def toLab(c: Color): LAB = {
     val R = Color.prepXyz(c.red)
     val G = Color.prepXyz(c.green)
     val B = Color.prepXyz(c.blue)
@@ -841,7 +838,7 @@ object Color {
   private val ref_U: Double = ( 4.0 * 95.047 ) / ( 95.047 + ( 15 * 100.0 ) + ( 3 * 108.883 ) )
   private val ref_V: Double = ( 9.0 * 100.0 ) / ( 95.047 + ( 15 * 100.0 ) + ( 3 * 108.883 ) )
 
-  @JSExport implicit def toLuv (xyz: XYZ): LUV = {
+  implicit def toLuv (xyz: XYZ): LUV = {
     val U: Double = ( 4.0 * xyz.X ) / ( xyz.X + ( 15.0 * xyz.Y ) + ( 3.0 * xyz.Z ) )
     val V: Double = ( 9.0 * xyz.Y ) / ( xyz.X + ( 15.0 * xyz.Y ) + ( 3.0 * xyz.Z ) )
 
@@ -856,7 +853,7 @@ object Color {
     FastFatLuv(L, u, v, xyz.argb)
   }
 
-  @JSExport implicit def toXyz (luv: LUV): XYZ = {
+  implicit def toXyz (luv: LUV): XYZ = {
     var y0: Double = ( luv.L + 16.0 ) / 116.0
     val powY0 = Math.pow(y0, 3.0)
     if ( powY0 > 0.008856 ) y0 = powY0
@@ -872,9 +869,9 @@ object Color {
     SlowSlimXYZ(X, Y, Z)
   }
 
-  @JSExport implicit def toLuv(c: Color): LUV = toLuv(toXyz(c))
+  implicit def toLuv(c: Color): LUV = toLuv(toXyz(c))
 
-  @JSExport implicit def toRgba(luv: LUV): RGBA = toXyz(luv)
+  implicit def toRgba(luv: LUV): RGBA = toXyz(luv)
 
   // xyz & lab conversion convenience methods:
   private def prepXyz(u: Int): Double = {
@@ -904,7 +901,7 @@ object Color {
    * @param c2 the top color, overlaid on top of c1.
    * @return the color resulting from the overlay of c2 on top of c1.
    */
-  @JSExport def alphaBlend(c1: RGBA, c2: RGBA): RGBA = {
+  def alphaBlend(c1: RGBA, c2: RGBA): RGBA = {
     if (c1.alpha >= 255) c1.argb
     else {
       val w1 = c1.alpha / 255.0
@@ -926,7 +923,7 @@ object Color {
    * @param w2 the weight of the second color in the range of [0-1].
    * @return the weighted average: c1 * w1 + c2 * w2.
    */
-  @JSExport def weightedAverage(c1: RGBA, w1: Float, c2: RGBA, w2: Float): RGBA = {
+  def weightedAverage(c1: RGBA, w1: Float, c2: RGBA, w2: Float): RGBA = {
     RGBA(
       (w1 * c1.red + w2 * c2.red).toInt,
       (w1 * c1.green + w2 * c2.green).toInt,
@@ -956,7 +953,7 @@ object Color {
    * @return an instance of the RGBA class.
    * @throws ColorComponentOutOfRangeException if one or more of the parameters lies outside of the range [0-255]
    */
-  @JSExport("RGBA") def rgba(red: Int, green: Int, blue: Int, alpha: Int = 255): RGBA = {
+  def rgba(red: Int, green: Int, blue: Int, alpha: Int = 255): RGBA = {
     if (!validRgbaIntensity(red)) throw ColorComponentOutOfRangeException(f"Red $red outside range [0-255]")
     if (!validRgbaIntensity(green)) throw ColorComponentOutOfRangeException(f"Green $green outside range [0-255]")
     if (!validRgbaIntensity(blue)) throw ColorComponentOutOfRangeException(f"Blue $blue outside range [0-255]")
@@ -975,7 +972,7 @@ object Color {
    * @return an instance of the HSV case class.
    * @throws ColorComponentOutOfRangeException if one or more of the parameters lies outside of their allowed ranges.
    */
-  @JSExport("HSV") def hsv(hue: Float, saturation: Float, value: Float): HSV = {
+  def hsv(hue: Float, saturation: Float, value: Float): HSV = {
     if (!validHue(hue)) throw ColorComponentOutOfRangeException(f"Hue $hue outside range [0-360]")
     if (!validPercentage(saturation)) throw ColorComponentOutOfRangeException(f"Saturation $saturation outside range [0-100]")
     if (!validPercentage(value)) throw ColorComponentOutOfRangeException(f"Value $value outside range [0-100]")
@@ -993,7 +990,7 @@ object Color {
    * @return an instance of the HSL case class.
    * @throws ColorComponentOutOfRangeException if one or more of the parameters lies outside of their allowed ranges.
    */
-  @JSExport("HSL") def hsl(hue: Float, saturation: Float, lightness: Float): HSL = {
+  def hsl(hue: Float, saturation: Float, lightness: Float): HSL = {
     if (!validHue(hue)) throw ColorComponentOutOfRangeException(f"Hue $hue outside range [0-360]")
     if (!validPercentage(saturation)) throw ColorComponentOutOfRangeException(f"Saturation $saturation outside range [0-100]")
     if (!validPercentage(lightness)) throw ColorComponentOutOfRangeException(f"Lightness $lightness outside range [0-100]")
@@ -1011,7 +1008,7 @@ object Color {
    * @return an instance of the CMYK class.
    * @throws ColorComponentOutOfRangeException if one or more of the parameters lies outside of their allowed ranges.
    */
-  @JSExport("CMYK") def cmyk(cyan: Float, magenta: Float, yellow: Float, black: Float): CMYK = {
+  def cmyk(cyan: Float, magenta: Float, yellow: Float, black: Float): CMYK = {
     if (!validWeight(cyan)) throw ColorComponentOutOfRangeException(f"Cyan $cyan outside range [0-1]")
     if (!validWeight(magenta)) throw ColorComponentOutOfRangeException(f"Magenta $magenta outside range [0-1]")
     if (!validWeight(yellow)) throw ColorComponentOutOfRangeException(f"Yellow $yellow outside range [0-1]")
@@ -1028,7 +1025,7 @@ object Color {
    * @return an instance of the XYZ case class.
    * @example {{{ val c = Color.xyz(22.527,38.820,26.728) }}}
    */
-  @JSExport("XYZ") def xyz(x: Float, y: Float, z: Float): XYZ = XYZ(x, y, z)
+  def xyz(x: Float, y: Float, z: Float): XYZ = XYZ(x, y, z)
 
   /**
    * Factory method to create instances of the LAB class.  This method does not validate its input parameters.
@@ -1039,7 +1036,7 @@ object Color {
    * @return an instance of the SlowSlimLab case class.
    * @example {{{ val c = Color.lab(72.872, -0.531, 71.770) }}}
    */
-  @JSExport("LAB") def lab(l: Float, a: Float, b: Float): LAB = SlowSlimLab(l, a, b)
+  def lab(l: Float, a: Float, b: Float): LAB = SlowSlimLab(l, a, b)
 
   /**
    * Factory method to create instances of the LUV class.  This method does not validate its input parameters.
@@ -1050,7 +1047,7 @@ object Color {
    * @return an instance of the SlowSlimLuv case class.
    * @example {{{ val c = Color.luv(14.756, -3.756, -58.528) }}}
    */
-  @JSExport("LUV") def luv(l: Float, u: Float, v: Float): LUV = SlowSlimLuv(l, u, v)
+  def luv(l: Float, u: Float, v: Float): LUV = SlowSlimLuv(l, u, v)
 
 }
 
