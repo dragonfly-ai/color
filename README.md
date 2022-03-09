@@ -21,6 +21,7 @@ However, when sampling from RGB space, most people experience such images as bia
 ![Image of Randomized Colors Sampled from RGB Space.](https://github.com/dragonfly-ai/color/blob/master/RGB.png "Image of Randomized Colors Sampled from RGB Space.")
 
 By contrast, by sampling from L* a* b* color space, most people experience this kind of image as a scrambled rainbow.
+
 ![Image of Randomized Colors Sampled from L* a* b* Space.](https://github.com/dragonfly-ai/color/blob/master/L*a*b*.png "Image of Randomized Colors Sampled from L* a* b* Space.")
 
 On a more practical basis, we often rely on random colors to distinguish two separate features in various data visualizations.
