@@ -1,3 +1,8 @@
+Welcome to Color!  This library has been replaced by a much more advanced one called Bitfröst.
+
+Please visit the Bitfröst project github page for much more useful color science tools.
+https://github.com/dragonfly-ai/bitfrost
+----------------------------------------------------------------
 This cross-published Scala.js library supports conversions between color spaces in both Scala and Javascript.
 
 In addition to support for common color spaces: RGB, RGBA, HSV, HSL, and CYMK, this library
